@@ -1,0 +1,6 @@
+name: Sentinels
+version: 1.0.0
+main: dev.tom.sentinels.Sentinels
+description: Play the Sentinels game
+api-version: 1.21.5
+
