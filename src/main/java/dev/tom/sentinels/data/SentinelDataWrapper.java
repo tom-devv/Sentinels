@@ -1,14 +1,12 @@
 package dev.tom.sentinels.data;
 
 import dev.tom.sentinels.Sentinels;
-import net.kyori.adventure.key.Namespaced;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin;
 
 import java.io.*;
 import java.util.Optional;
@@ -74,6 +72,22 @@ public class SentinelDataWrapper {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * @param item   item with PDC data
+     * @param entity entity to transfer PDC to
+     * @param <I>
+     * @param <E>
+     * @param <T>
+     * @return a pair of pdc data and optional entity spawned
+     */
+    public <I extends ItemStack, E extends Entity, T extends Serializable> Optional<PDCTransferResult<T, E>> transferItemPDC(I item, E entity, Class<T> type) {
+        Optional<T> optionalData = SentinelDataWrapper.getInstance().loadPDC(item.getItemMeta(), type);
+        if (optionalData.isEmpty()) return Optional.empty();
+        T attributes = optionalData.get();
+        SentinelDataWrapper.getInstance().savePDC(entity, attributes);
+        return Optional.of(new PDCTransferResult<>(attributes, entity));
     }
 
     private static byte[] serializeToByteArray(Object object) throws IOException {

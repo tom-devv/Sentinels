@@ -1,15 +1,17 @@
-package dev.tom.sentinels.data;
+package dev.tom.sentinels.projectiles.shells;
+
+import dev.tom.sentinels.projectiles.Gravity;
 
 import java.io.Serializable;
 
-public class DamagingAttributes implements Serializable, Gravity {
+public class ShellAttributes implements Serializable, Gravity {
     private static final long serialVersionUID = 1L; // Recommended
 
     private double damage;
     private double radius;
     private boolean gravity;
 
-    public DamagingAttributes(double damage, boolean gravity, double radius) {
+    public ShellAttributes(double damage, boolean gravity, double radius) {
         this.damage = damage;
         this.gravity = gravity;
         this.radius = radius;

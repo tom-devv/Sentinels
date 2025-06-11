@@ -1,13 +1,11 @@
-package dev.tom.sentinels.listeners;
+package dev.tom.sentinels.projectiles.shells;
 
-import dev.tom.sentinels.data.DamagingAttributes;
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.projectiles.ProjectileManager;
 import dev.tom.sentinels.regions.protection.Barrier;
 import dev.tom.sentinels.regions.protection.BarrierManager;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -17,19 +15,18 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ArrowListeners implements Listener {
+public class ShellListeners implements Listener {
 
     @EventHandler
     public void projectileExplosion(EntityExplodeEvent e){
         if(!(e.getEntity() instanceof TNTPrimed tnt)) return;
-        Optional<DamagingAttributes> optionalData = SentinelDataWrapper.getInstance().loadPDC(tnt, DamagingAttributes.class);
+        Optional<ShellAttributes> optionalData = SentinelDataWrapper.getInstance().loadPDC(tnt, ShellAttributes.class);
         if(optionalData.isEmpty()) return;
-        DamagingAttributes attributes = optionalData.get();
+        ShellAttributes attributes = optionalData.get();
         List<Block> blockList = new ArrayList<>(e.blockList());
         e.blockList().clear(); // Don't actually damage blocks;
         blockList.forEach(block -> {
@@ -43,9 +40,9 @@ public class ArrowListeners implements Listener {
     @EventHandler
     public void projectileHit(ProjectileHitEvent e){
         Projectile projectile = e.getEntity();
-        Optional<DamagingAttributes> optionalData = SentinelDataWrapper.getInstance().loadPDC(projectile, DamagingAttributes.class);
+        Optional<ShellAttributes> optionalData = SentinelDataWrapper.getInstance().loadPDC(projectile, ShellAttributes.class);
         if(optionalData.isEmpty()) return;
-        DamagingAttributes attributes = optionalData.get();
+        ShellAttributes attributes = optionalData.get();
         Block block = e.getHitBlock();
         Barrier barrier = BarrierManager.getInstance().getBarrier(block.getLocation());
         if(barrier == null) return;
@@ -66,8 +63,9 @@ public class ArrowListeners implements Listener {
     public void projectileFire(EntityShootBowEvent e){
         ItemStack item = e.getConsumable();
         if(item == null) return;
-        ProjectileManager.getInstance().transferPDC(item, e.getProjectile(), DamagingAttributes.class).ifPresent(result -> {
-            result.entity().setGravity(result.data().hasGravity());
-        });
+        SentinelDataWrapper.getInstance().transferItemPDC(item, e.getProjectile(), ShellAttributes.class)
+                .ifPresent(result -> {
+                    result.entity().setGravity(result.data().hasGravity());
+                });
     }
 }

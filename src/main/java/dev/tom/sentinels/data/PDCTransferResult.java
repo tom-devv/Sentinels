@@ -1,4 +1,4 @@
-package dev.tom.sentinels.projectiles;
+package dev.tom.sentinels.data;
 
 import org.bukkit.entity.Entity;
 

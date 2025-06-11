@@ -24,10 +24,6 @@ public class AllayRepairGoal implements Goal<Allay> {
         this.fixBlock = fixBlock;
     }
 
-    private void findLocation() {
-
-    }
-
     @Override
     public boolean shouldActivate() {
         return true;

@@ -1,4 +1,4 @@
-package dev.tom.sentinels.data;
+package dev.tom.sentinels.projectiles;
 
 public interface Gravity {
 

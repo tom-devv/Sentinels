@@ -1,22 +1,15 @@
 package dev.tom.sentinels.projectiles;
 
 import dev.tom.sentinels.Sentinels;
-import dev.tom.sentinels.data.Gravity;
-import dev.tom.sentinels.data.SentinelDataWrapper;
+import dev.tom.sentinels.data.PDCTransferResult;
 
-import dev.tom.sentinels.events.EntityCollisionEvent;
+import dev.tom.sentinels.data.SentinelDataWrapper;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class ProjectileManager {
@@ -33,23 +26,6 @@ public class ProjectileManager {
         return INSTANCE;
     }
 
-    private Map<Entity, BukkitTask> trackedEntities = new HashMap<>();
-
-    /**
-     * @param item   item with PDC data
-     * @param entity entity to transfer PDC to
-     * @param <I>
-     * @param <E>
-     * @param <T>
-     * @return a pair of pdc data and optional entity spawned
-     */
-    public <I extends ItemStack, E extends Entity, T extends Serializable> Optional<PDCTransferResult<T, E>> transferPDC(I item, E entity, Class<T> type) {
-        Optional<T> optionalData = SentinelDataWrapper.getInstance().loadPDC(item.getItemMeta(), type);
-        if (optionalData.isEmpty()) return Optional.empty();
-        T attributes = optionalData.get();
-        SentinelDataWrapper.getInstance().savePDC(entity, attributes);
-        return Optional.of(new PDCTransferResult<>(attributes, entity));
-    }
 
     public <I extends ItemStack, T extends Serializable, E extends Entity> Optional<PDCTransferResult<T, E>> launchEntity(I item, Player player, Class<T> type) {
         Location location = player.getEyeLocation();
@@ -64,7 +40,7 @@ public class ProjectileManager {
         // Collision Detector
         new CollisionDetector(Sentinels.getInstance(), falling).detect();
 
-        Optional<PDCTransferResult<T, Entity>> optionalResult = transferPDC(item, falling, type);
+        Optional<PDCTransferResult<T, Entity>> optionalResult = SentinelDataWrapper.getInstance().transferItemPDC(item, falling, type);
         if (optionalResult.isPresent()) {
             T attributes = optionalResult.get().data();
 
