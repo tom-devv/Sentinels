@@ -11,8 +11,12 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class CollisionDetector {
+
 
     private static final int NUM_RAYS = 12;
     private static final double RAY_DISTANCE = 0.7;
@@ -28,6 +32,8 @@ public class CollisionDetector {
         }
     }
 
+    private static Map<Entity, CollisionDetector> trackedEntities = new HashMap<>();
+
     private final Entity entity;
     private final JavaPlugin plugin;
     private BukkitTask collisionTask;
@@ -35,6 +41,7 @@ public class CollisionDetector {
     public CollisionDetector(JavaPlugin plugin, Entity entity){
         this.entity = entity;
         this.plugin = plugin;
+        trackedEntities.put(entity, this);
     }
     public BukkitTask detect() {
         return detect(20 * 15); // 15 second timeout
@@ -46,7 +53,7 @@ public class CollisionDetector {
             @Override
             public void run() {
                 if(!entity.isValid() || i >= timeout) {
-                    cancel();
+                    stopCollisionTask();
                 }
                 Location currentLocation = entity.getLocation();
                 for (int i = 0; i < rayDirections.length; i++) {
@@ -64,10 +71,21 @@ public class CollisionDetector {
                     Block block = trace.getHitBlock();
                     EntityCollisionEvent event = new EntityCollisionEvent(entity, block);
                     plugin.getServer().getPluginManager().callEvent(event);
+                    stopCollisionTask();
+                    return;
                 }
                 i++;
             }
         }.runTaskTimer(this.plugin, 0, 1);
         return collisionTask;
+    }
+
+    private void stopCollisionTask() {
+        trackedEntities.remove(entity);
+        if(this.collisionTask != null) {
+            if (!this.collisionTask.isCancelled()) {
+                this.collisionTask.cancel();
+            }
+        }
     }
 }
