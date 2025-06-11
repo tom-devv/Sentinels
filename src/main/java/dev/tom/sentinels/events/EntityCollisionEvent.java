@@ -9,13 +9,12 @@ import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-public class EntityCollisionEvent extends EntityEvent implements Cancellable {
+public class EntityCollisionEvent extends EntityEvent {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
     private final Block hitBlock;
 
-    private boolean cancelled;
 
     public EntityCollisionEvent(Entity flare, Block hitBlock) {
         super(flare);
@@ -37,13 +36,4 @@ public class EntityCollisionEvent extends EntityEvent implements Cancellable {
         return HANDLER_LIST;
     }
 
-    @Override
-    public boolean isCancelled() {
-        return false;
-    }
-
-    @Override
-    public void setCancelled(boolean cancel) {
-
-    }
 }

@@ -6,10 +6,12 @@ import dev.tom.sentinels.data.SentinelDataWrapper;
 
 import dev.tom.sentinels.events.EntityCollisionEvent;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.io.Serializable;
@@ -53,16 +55,14 @@ public class ProjectileManager {
         Location location = player.getEyeLocation();
         Vector direction = location.getDirection();
 
-//        Display display = location.getWorld().spawn(location, ItemDisplay.class, spawned -> {
-//            spawned.setVelocity(direction);
-//            spawned.setItemStack(item);
-//        });
 
         FallingBlock falling = location.getWorld().spawn(location, FallingBlock.class, spawned -> {
             spawned.setVelocity(direction);
             spawned.setBlockData(item.getType().createBlockData());
         });
 
+        // Collision Detector
+        new CollisionDetector(Sentinels.getInstance(), falling).detect();
 
         Optional<PDCTransferResult<T, Entity>> optionalResult = transferPDC(item, falling, type);
         if (optionalResult.isPresent()) {
@@ -81,24 +81,10 @@ public class ProjectileManager {
             );
             return finalResult;
         } else {
+            // Should never fire
             System.err.println("Failed to transfer PDC for ItemStack: " + item);
             return Optional.empty();
         }
-    }
-
-    private BukkitTask createEntityCollisionTsk(Entity entity) {
-        return new BukkitRunnable(){
-            @Override
-            public void run() {
-                Vector velocity = entity.getVelocity();
-                EntityCollisionEvent event;
-                if(velocity.getX() == 0){
-                    // Check block it collided with
-                }
-
-                // Same for y and z
-            }
-        }.runTaskTimer(Sentinels.getInstance(), 0, 1);
     }
 
 }
