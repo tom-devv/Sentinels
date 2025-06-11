@@ -25,17 +25,14 @@ public class FlareListeners implements Listener {
         if(e.getItem() == null) return;
         if(!e.getItem().getType().equals(Material.RED_CANDLE)) return;
         Player player = e.getPlayer();
-        FlareAttributes attributes = new FlareAttributes(false, 10, 11, 12);
-        ItemStack item = player.getInventory().getItemInMainHand();
-        ItemMeta meta = item.getItemMeta();
-        SentinelDataWrapper.getInstance().savePDC(meta, attributes);
-        item.setItemMeta(meta);
+        ItemStack item = e.getItem();
+        // Not a flare, can't fire
+        if(!SentinelDataWrapper.getInstance().isType(item.getItemMeta(), FlareAttributes.class)) return;
         Optional<PDCTransferResult<FlareAttributes, Display>> result = ProjectileManager.getInstance().launchEntity(
                 item,
                 player,
                 FlareAttributes.class
         );
-
     }
 
 }
