@@ -1,18 +1,18 @@
-package dev.tom.sentinels.listeners;
+package dev.tom.sentinels.projectiles.flares;
 
-import dev.tom.sentinels.data.FlareAttributes;
 import dev.tom.sentinels.data.SentinelDataWrapper;
-import dev.tom.sentinels.projectiles.PDCTransferResult;
+import dev.tom.sentinels.events.EntityCollisionEvent;
+import dev.tom.sentinels.data.PDCTransferResult;
 import dev.tom.sentinels.projectiles.ProjectileManager;
 import org.bukkit.Material;
-import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Optional;
 
@@ -28,11 +28,23 @@ public class FlareListeners implements Listener {
         ItemStack item = e.getItem();
         // Not a flare, can't fire
         if(!SentinelDataWrapper.getInstance().isType(item.getItemMeta(), FlareAttributes.class)) return;
-        Optional<PDCTransferResult<FlareAttributes, Display>> result = ProjectileManager.getInstance().launchEntity(
+        Optional<PDCTransferResult<FlareAttributes, FallingBlock>> result = ProjectileManager.getInstance().launchEntity(
                 item,
                 player,
                 FlareAttributes.class
         );
+    }
+
+    @EventHandler
+    public void entityCollide(EntityCollisionEvent e){
+        if(!e.getEntity().isValid()) return;
+        Entity entity = e.getEntity();
+        if(!SentinelDataWrapper.getInstance().isType(entity, FlareAttributes.class)) return;
+        // Flares only
+        Optional<FlareAttributes> optionalAttributes = SentinelDataWrapper.getInstance().loadPDC(entity, FlareAttributes.class);
+        if(optionalAttributes.isEmpty()) return;
+        FlareAttributes attributes = optionalAttributes.get();
+        e.getEntity().remove(); // Remove entity now PDC transferred
     }
 
 }
