@@ -5,6 +5,7 @@ import net.kyori.adventure.key.Namespaced;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
@@ -30,12 +31,23 @@ public class SentinelDataWrapper {
         return INSTANCE;
     }
 
+    public <T extends Serializable, P extends PersistentDataHolder> boolean isType(P holder, Class<T> type){
+        Optional<T> optionalData = loadPDC(holder, type);
+        return optionalData.isPresent();
+    }
+
+    public <T extends Serializable> ItemStack savePDC(ItemStack item, T data){
+        ItemMeta meta = item.getItemMeta();
+        savePDC(meta, data);
+        item.setItemMeta(meta);
+        return item;
+    }
+
     /**
      * Save a serializable class to a PDC
      * @param holder the PDC
      * @param data class data
      * @param <T> Type
-     * @throws IOException
      */
     public <T extends Serializable, P extends PersistentDataHolder> P savePDC(P holder, T data)  {
         byte[] bytes;
@@ -63,7 +75,6 @@ public class SentinelDataWrapper {
             throw new RuntimeException(e);
         }
     }
-
 
     private static byte[] serializeToByteArray(Object object) throws IOException {
         ByteArrayOutputStream bos = null;
