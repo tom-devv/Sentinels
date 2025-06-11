@@ -1,16 +1,31 @@
 package dev.tom.sentinels.data;
 
+import org.bukkit.entity.Player;
+
+import java.util.UUID;
+
 public class FlareAttributes implements Gravity, java.io.Serializable {
+
+    private UUID firedBy;
     private int mobCount;
-    private int mobHealth;
+    private double mobHealth;
     private double healingPerTick;
     private boolean gravity;
 
-    public FlareAttributes(boolean gravity, double healingPerTick, int mobHealth, int mobCount) {
+    public FlareAttributes(Player player, boolean gravity, double healingPerTick, double mobHealth, int mobCount) {
+        this.firedBy = player.getUniqueId();
         this.gravity = gravity;
         this.healingPerTick = healingPerTick;
         this.mobHealth = mobHealth;
         this.mobCount = mobCount;
+    }
+
+    public UUID getFiredBy() {
+        return firedBy;
+    }
+
+    public void setFiredBy(UUID firedBy) {
+        this.firedBy = firedBy;
     }
 
     public double getHealingPerTick() {
@@ -29,11 +44,11 @@ public class FlareAttributes implements Gravity, java.io.Serializable {
         this.mobCount = mobCount;
     }
 
-    public int getMobHealth() {
+    public double getMobHealth() {
         return mobHealth;
     }
 
-    public void setMobHealth(int mobHealth) {
+    public void setMobHealth(double mobHealth) {
         this.mobHealth = mobHealth;
     }
 
