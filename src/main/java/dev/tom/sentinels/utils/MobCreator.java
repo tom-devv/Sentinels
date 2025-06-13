@@ -1,4 +1,4 @@
-package dev.tom.sentinels.util;
+package dev.tom.sentinels.utils;
 
 import dev.tom.sentinels.ai.AllayRepairGoal;
 import org.bukkit.Bukkit;

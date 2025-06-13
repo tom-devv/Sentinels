@@ -69,7 +69,7 @@ public class CollisionDetector {
                     if(trace == null || trace.getHitBlock() == null) continue;
 
                     Block block = trace.getHitBlock();
-                    EntityCollisionEvent event = new EntityCollisionEvent(entity, block);
+                    EntityCollisionEvent event = new EntityCollisionEvent(entity, block, trace.getHitBlockFace());
                     plugin.getServer().getPluginManager().callEvent(event);
                     stopCollisionTask();
                     return;

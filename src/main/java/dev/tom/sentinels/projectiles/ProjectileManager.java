@@ -47,7 +47,7 @@ public class ProjectileManager {
             //Check if gravity then assign to entity
             if (Gravity.class.isAssignableFrom(type)) {
                 if (attributes instanceof Gravity gravityAttributes) {
-                    falling.setGravity(gravityAttributes.hasGravity());
+                    falling.setGravity(gravityAttributes.gravity());
                 }
             }
 

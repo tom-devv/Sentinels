@@ -1,7 +1,6 @@
 package dev.tom.sentinels.projectiles.shells;
 
 import dev.tom.sentinels.data.SentinelDataWrapper;
-import dev.tom.sentinels.projectiles.ProjectileManager;
 import dev.tom.sentinels.regions.protection.Barrier;
 import dev.tom.sentinels.regions.protection.BarrierManager;
 import org.bukkit.World;
@@ -32,7 +31,7 @@ public class ShellListeners implements Listener {
         blockList.forEach(block -> {
             Barrier barrier = BarrierManager.getInstance().getBarrier(block.getLocation());
             if(barrier != null) {
-                barrier.damage(attributes.getDamage());
+                barrier.damage(attributes.damage());
             }
         });
     }
@@ -50,7 +49,7 @@ public class ShellListeners implements Listener {
         World world = block.getWorld();
         world.spawn(block.getLocation(), TNTPrimed.class, tnt -> {
             SentinelDataWrapper.getInstance().savePDC(tnt, attributes);
-            tnt.setYield((float) attributes.getRadius());
+            tnt.setYield((float) attributes.radius());
             tnt.setFuseTicks(0); // Explode quickly
             tnt.setGravity(false); // Don't move down at all
         });
@@ -65,7 +64,7 @@ public class ShellListeners implements Listener {
         if(item == null) return;
         SentinelDataWrapper.getInstance().transferItemPDC(item, e.getProjectile(), ShellAttributes.class)
                 .ifPresent(result -> {
-                    result.entity().setGravity(result.data().hasGravity());
+                    result.entity().setGravity(result.data().gravity());
                 });
     }
 }

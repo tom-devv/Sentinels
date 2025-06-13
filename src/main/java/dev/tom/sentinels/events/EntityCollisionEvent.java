@@ -14,11 +14,17 @@ public class EntityCollisionEvent extends EntityEvent {
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
     private final Block hitBlock;
+    private final BlockFace hitBlockFace;
 
 
-    public EntityCollisionEvent(Entity flare, Block hitBlock) {
+    public EntityCollisionEvent(Entity flare, Block hitBlock, BlockFace hitBlockFace) {
         super(flare);
         this.hitBlock = hitBlock;
+        this.hitBlockFace = hitBlockFace;
+    }
+
+    public BlockFace getHitBlockFace() {
+        return hitBlockFace;
     }
 
     public Block getHitBlock() {
