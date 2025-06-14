@@ -38,13 +38,15 @@ public class PhysicsManager {
         Location location = player.getEyeLocation();
         Vector direction = location.getDirection();
 
-
-        BlockDisplay display = location.getWorld().spawn(location, BlockDisplay.class, spawned -> {
+        // Offset to launch at right hand
+        // This means it does NOT align with crosshair
+        Location launchLocation = location.clone().add(-0.7,0.3,0);
+        BlockDisplay display = location.getWorld().spawn(launchLocation, BlockDisplay.class, spawned -> {
             spawned.setBlock(Material.RED_CANDLE.createBlockData());
             spawned.setRotation(player.getYaw(), 90);
             spawned.setVelocity(direction.normalize());
-            spawned.setTeleportDuration(1);
-            spawned.setInterpolationDuration(1);
+            spawned.setTeleportDuration(2);
+            spawned.setInterpolationDuration(5);
         });
 
         Optional<PDCTransferResult<T, Entity>> optionalResult = SentinelDataWrapper.getInstance().transferItemPDC(item, display, type);
@@ -61,7 +63,6 @@ public class PhysicsManager {
 
             // Physics
             new DisplayPhysics(display);
-            new CollisionDetector(Sentinels.getInstance(), display).detect();
 
             @SuppressWarnings("unchecked")
             Optional<PDCTransferResult<T, E>> finalResult = Optional.of(

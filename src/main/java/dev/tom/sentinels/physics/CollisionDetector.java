@@ -18,7 +18,7 @@ import java.util.Map;
 public class CollisionDetector {
 
 
-    private static final int NUM_RAYS = 24;
+    private static final int NUM_RAYS = 64;
     private static final double RAY_DISTANCE = 0.7;
 
     static Vector[] rayDirections = new Vector[NUM_RAYS];
@@ -50,11 +50,11 @@ public class CollisionDetector {
                 if(!entity.isValid()) {
                     stopCollisionTask();
                 }
-                Location currentLocation = entity.getLocation();
                 for (int i = 0; i < rayDirections.length; i++) {
                     Vector rayDirection = rayDirections[i];
+                    Location centerLocation = new Location(entity.getWorld(), entity.getBoundingBox().getCenterX(), entity.getBoundingBox().getCenterY(), entity.getBoundingBox().getCenterZ());
                     RayTraceResult trace = entity.getWorld().rayTraceBlocks(
-                            currentLocation,
+                            centerLocation,
                             rayDirection,
                             RAY_DISTANCE,
                             FluidCollisionMode.NEVER,
