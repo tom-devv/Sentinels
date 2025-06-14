@@ -33,7 +33,7 @@ public class Sentinels extends JavaPlugin implements Listener {
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
             spawnCube();
-        }, 20 * 10);
+        }, 20 * 3);
     }
 
     public void spawnCube() {
@@ -50,14 +50,15 @@ public class Sentinels extends JavaPlugin implements Listener {
 
     @EventHandler
     public void interact(PlayerInteractEvent e){
-//        if(!e.getHand().equals(EquipmentSlot.MAINHAND)) return;
         if(!e.getAction().isRightClick()) return;
         Block block = e.getClickedBlock();
         if(block == null) return;
         Barrier barrier = BarrierManager.getInstance().getBarrier(block.getLocation());
-        if(barrier == null) return;
+        if(barrier == null) {
+            System.out.println("Null barrier");
+            return;
+        }
         e.getPlayer().sendMessage("Barrier health: " + barrier.getHealth());
-
     }
 
 

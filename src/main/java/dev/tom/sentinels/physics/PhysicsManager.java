@@ -1,0 +1,103 @@
+package dev.tom.sentinels.physics;
+
+import dev.tom.sentinels.Sentinels;
+import dev.tom.sentinels.data.PDCTransferResult;
+
+import dev.tom.sentinels.data.SentinelDataWrapper;
+import dev.tom.sentinels.projectiles.Gravity;
+import dev.tom.sentinels.projectiles.Velocity;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
+import java.io.Serializable;
+import java.util.Optional;
+
+/**
+ * Manages active physics objects like flares and shells
+ */
+public class PhysicsManager {
+
+    private static PhysicsManager INSTANCE;
+
+    private PhysicsManager() {
+    }
+
+    public static PhysicsManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new PhysicsManager();
+        }
+        return INSTANCE;
+    }
+
+
+    public <I extends ItemStack, T extends Serializable, E extends Entity> Optional<PDCTransferResult<T, E>> launchEntity(I item, Player player, Class<T> type) {
+        Location location = player.getEyeLocation();
+        Vector direction = location.getDirection();
+
+
+        BlockDisplay display = location.getWorld().spawn(location, BlockDisplay.class, spawned -> {
+            spawned.setBlock(Material.RED_CANDLE.createBlockData());
+            spawned.setRotation(player.getYaw(), 90);
+            spawned.setVelocity(direction.normalize());
+            spawned.setTeleportDuration(1);
+            spawned.setInterpolationDuration(1);
+        });
+
+        Optional<PDCTransferResult<T, Entity>> optionalResult = SentinelDataWrapper.getInstance().transferItemPDC(item, display, type);
+        if (optionalResult.isPresent()) {
+            T attributes = optionalResult.get().data();
+
+            //Check if gravity then assign to entity
+            if (attributes instanceof Gravity gravityAttributes) {
+                display.setGravity(gravityAttributes.gravity());
+            }
+            if(attributes instanceof Velocity velocityAttributes) {
+                display.setVelocity(display.getVelocity().multiply(velocityAttributes.velocity()));
+            }
+
+            // Physics
+            new DisplayPhysics(display);
+            new CollisionDetector(Sentinels.getInstance(), display).detect();
+
+            @SuppressWarnings("unchecked")
+            Optional<PDCTransferResult<T, E>> finalResult = Optional.of(
+                    new PDCTransferResult<>(attributes, (E) display)
+            );
+            return finalResult;
+        } else {
+            // Should never fire
+            System.err.println("Failed to transfer PDC for ItemStack: " + item);
+            return Optional.empty();
+        }
+        // Physics
+    }
+
+    private void projectileCheckupTask(Entity entity, Vector velocity){
+        projectileCheckupTask(entity, velocity, 20 * 15); // 15 second timeout
+    }
+
+    /**
+     * Run tasks every tick for an entity
+     * @param entity
+     * @param velocity
+     */
+    private void projectileCheckupTask(Entity entity, Vector velocity, int timeout) {
+        new BukkitRunnable() {
+            int i = 0;
+            @Override
+            public void run() {
+                if(!entity.isValid() || i > timeout) {
+                    cancel();
+                }
+                // Do not touch y velocity
+                entity.setVelocity(new Vector(velocity.getX(), entity.getVelocity().getY(), velocity.getZ()));
+                i++;
+            }
+        }.runTaskTimer(Sentinels.getInstance(), 0L, 1);
+    }
+
+}

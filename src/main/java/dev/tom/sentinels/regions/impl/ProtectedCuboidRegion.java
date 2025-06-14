@@ -44,6 +44,11 @@ public class ProtectedCuboidRegion extends CuboidRegion implements Protected, He
     }
 
     @Override
+    public boolean isMaxHealth() {
+        return getHealth() == getMaxHealth();
+    }
+
+    @Override
     public double damage(double amount) {
         if (barriers.isEmpty() || amount <= 0.0) return getHealth();
 

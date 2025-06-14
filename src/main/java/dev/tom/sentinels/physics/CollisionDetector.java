@@ -1,4 +1,4 @@
-package dev.tom.sentinels.projectiles;
+package dev.tom.sentinels.physics;
 
 import dev.tom.sentinels.events.EntityCollisionEvent;
 import org.bukkit.FluidCollisionMode;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class CollisionDetector {
 
 
-    private static final int NUM_RAYS = 12;
+    private static final int NUM_RAYS = 24;
     private static final double RAY_DISTANCE = 0.7;
 
     static Vector[] rayDirections = new Vector[NUM_RAYS];
@@ -27,7 +27,6 @@ public class CollisionDetector {
         for (int i = 0; i < NUM_RAYS; i++) {
             double angleDegrees = i * (360.0 / NUM_RAYS);
             double angleRadians = Math.toRadians(angleDegrees);
-            // Rays are horizontal, so Y component is 0
             rayDirections[i] = new Vector(Math.cos(angleRadians), 0, Math.sin(angleRadians)).normalize();
         }
     }
@@ -43,16 +42,12 @@ public class CollisionDetector {
         this.plugin = plugin;
         trackedEntities.put(entity, this);
     }
-    public BukkitTask detect() {
-        return detect(20 * 15); // 15 second timeout
-    }
 
-    public BukkitTask detect(int timeout){
+    public BukkitTask detect(){
         this.collisionTask = new BukkitRunnable() {
-            int i = 0;
             @Override
             public void run() {
-                if(!entity.isValid() || i >= timeout) {
+                if(!entity.isValid()) {
                     stopCollisionTask();
                 }
                 Location currentLocation = entity.getLocation();
@@ -65,7 +60,6 @@ public class CollisionDetector {
                             FluidCollisionMode.NEVER,
                             true
                     );
-
                     if(trace == null || trace.getHitBlock() == null) continue;
 
                     Block block = trace.getHitBlock();
@@ -74,7 +68,6 @@ public class CollisionDetector {
                     stopCollisionTask();
                     return;
                 }
-                i++;
             }
         }.runTaskTimer(this.plugin, 0, 1);
         return collisionTask;

@@ -1,20 +1,28 @@
 package dev.tom.sentinels.projectiles.flares;
 
 import dev.tom.sentinels.projectiles.Gravity;
-import org.bukkit.entity.Player;
+import dev.tom.sentinels.projectiles.Velocity;
+
+import java.util.UUID;
 
 
 public record FlareAttributes(
-        Player player,
+        UUID uuid,
         boolean gravity,
         double healingPerTick,
         double mobHealth,
         int mobCount,
-        int searchRadius
-) implements Gravity, java.io.Serializable {
+        int searchRadius,
+        double velocity
+) implements Gravity, Velocity, java.io.Serializable {
 
     @Override
     public boolean gravity() {
         return this.gravity;
+    }
+
+    @Override
+    public double velocity() {
+        return this.velocity;
     }
 }

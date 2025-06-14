@@ -3,6 +3,7 @@ package dev.tom.sentinels.regions.impl;
 import dev.tom.sentinels.regions.Region;
 import dev.tom.sentinels.regions.RegionFlag;
 import dev.tom.sentinels.regions.RegionManager;
+import dev.tom.sentinels.regions.protection.Barrier;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;

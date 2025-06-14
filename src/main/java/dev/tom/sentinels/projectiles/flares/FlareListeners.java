@@ -3,8 +3,9 @@ package dev.tom.sentinels.projectiles.flares;
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.events.EntityCollisionEvent;
 import dev.tom.sentinels.data.PDCTransferResult;
-import dev.tom.sentinels.projectiles.ProjectileManager;
-import org.bukkit.Material;
+import dev.tom.sentinels.physics.PhysicsManager;
+import dev.tom.sentinels.utils.MobCreator;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
@@ -23,12 +24,11 @@ public class FlareListeners implements Listener {
         // Only fire when interacting with air
         if(e.getAction() != Action.RIGHT_CLICK_AIR) return;
         if(e.getItem() == null) return;
-        if(!e.getItem().getType().equals(Material.RED_CANDLE)) return;
         Player player = e.getPlayer();
         ItemStack item = e.getItem();
-        // Not a flare, can't fire
         if(!SentinelDataWrapper.getInstance().isType(item.getItemMeta(), FlareAttributes.class)) return;
-        Optional<PDCTransferResult<FlareAttributes, FallingBlock>> result = ProjectileManager.getInstance().launchEntity(
+        // Not a flare, can't fire
+        Optional<PDCTransferResult<FlareAttributes, FallingBlock>> result = PhysicsManager.getInstance().launchEntity(
                 item,
                 player,
                 FlareAttributes.class
@@ -44,6 +44,8 @@ public class FlareListeners implements Listener {
         Optional<FlareAttributes> optionalAttributes = SentinelDataWrapper.getInstance().loadPDC(entity, FlareAttributes.class);
         if(optionalAttributes.isEmpty()) return;
         FlareAttributes attributes = optionalAttributes.get();
+        Block block = e.getHitBlock();
+        MobCreator.createAllays(block.getLocation().add(e.getHitBlockFace().getDirection()), block.getLocation(), attributes);
         e.getEntity().remove(); // Remove entity now PDC transferred
     }
 

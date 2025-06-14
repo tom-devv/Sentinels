@@ -43,6 +43,7 @@ public class ShellListeners implements Listener {
         if(optionalData.isEmpty()) return;
         ShellAttributes attributes = optionalData.get();
         Block block = e.getHitBlock();
+        if(block == null) return; // hit entity instead
         Barrier barrier = BarrierManager.getInstance().getBarrier(block.getLocation());
         if(barrier == null) return;
         // Spawn explosion to handle blocklist radius etc

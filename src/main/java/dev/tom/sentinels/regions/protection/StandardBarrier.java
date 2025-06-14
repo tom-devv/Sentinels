@@ -59,22 +59,27 @@ public class StandardBarrier implements Barrier {
     }
 
     @Override
+    public boolean isMaxHealth() {
+        return getHealth() == getMaxHealth();
+    }
+
+    @Override
     public double damage(double amount) {
-        double newHealth = Math.min(health - amount, MAX_HEALTH);
+        double newHealth = health - amount;
         setHealth(newHealth);
         return health;
     }
 
     @Override
     public double repair(double amount) {
-        double newHealth = Math.max(health + amount, MAX_HEALTH);
+        double newHealth = getHealth() + amount;
         setHealth(newHealth);
         return newHealth;
     }
 
     @Override
     public void setHealth(double health) {
-        this.health = health;
+        this.health = Math.max(0, Math.min(health, getMaxHealth()));
         if(isDead() || health < 0) {
             destroy();
             return;

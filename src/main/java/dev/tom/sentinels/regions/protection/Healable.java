@@ -14,6 +14,12 @@ public interface Healable {
     double getMaxHealth();
 
     /**
+     * Check if this is max health
+     * @return is max health
+     */
+    boolean isMaxHealth();
+
+    /**
      * Applies damage to the barrier, reducing its health.
      * @param amount The amount of damage to apply.
      * @return The new health value.

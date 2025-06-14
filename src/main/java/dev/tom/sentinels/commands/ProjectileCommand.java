@@ -43,23 +43,25 @@ public class ProjectileCommand {
                 .then(Commands.literal("flare")
                         .then(Commands.argument("count", IntegerArgumentType.integer(1))
                         .then(Commands.argument("health", DoubleArgumentType.doubleArg(0.1))
-                        .then(Commands.argument("healing", DoubleArgumentType.doubleArg(0.1))
+                        .then(Commands.argument("healing", DoubleArgumentType.doubleArg(0.01))
                         .then(Commands.argument("gravity", BoolArgumentType.bool())
                         .then(Commands.argument("radius", IntegerArgumentType.integer(1))
+                        .then(Commands.argument("velocity", DoubleArgumentType.doubleArg(0.1))
                             .executes(ctx -> {
                                 if(!(ctx.getSource().getSender() instanceof Player player)) return 0;
-                                ItemStack flareItem = ItemStack.of(Material.RED_CANDLE);
+                                ItemStack flareItem = ItemStack.of(Material.END_ROD);
                                 int count = IntegerArgumentType.getInteger(ctx, "count");
                                 double health = DoubleArgumentType.getDouble(ctx, "health");
                                 double healing = DoubleArgumentType.getDouble(ctx, "healing");
                                 boolean gravity = BoolArgumentType.getBool(ctx, "gravity");
                                 int radius = IntegerArgumentType.getInteger(ctx, "radius");
-                                FlareAttributes attr = new FlareAttributes(player, gravity, healing, health, count, radius);
+                                double velocity = DoubleArgumentType.getDouble(ctx, "velocity");
+                                FlareAttributes attr = new FlareAttributes(player.getUniqueId(), gravity, healing, health, count, radius, velocity);
                                 SentinelDataWrapper.getInstance().savePDC(flareItem, attr);
                                 player.getInventory().addItem(flareItem);
                                 return Command.SINGLE_SUCCESS;
                             })
-                        )))))
+                        ))))))
                 );
 
     }
