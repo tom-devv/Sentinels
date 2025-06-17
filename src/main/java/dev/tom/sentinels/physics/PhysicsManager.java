@@ -11,7 +11,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -47,6 +50,12 @@ public class PhysicsManager {
             spawned.setVelocity(direction.normalize());
             spawned.setTeleportDuration(2);
             spawned.setInterpolationDuration(5);
+            spawned.setTransformation(new Transformation(
+                    new Vector3f(-0.5f,0f,0f),
+                    new Quaternionf(),
+                    new Vector3f(1,1,1),
+                    new Quaternionf()
+            ));
         });
 
         Optional<PDCTransferResult<T, Entity>> optionalResult = SentinelDataWrapper.getInstance().transferItemPDC(item, display, type);

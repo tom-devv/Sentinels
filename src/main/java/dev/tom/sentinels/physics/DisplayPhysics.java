@@ -2,32 +2,23 @@ package dev.tom.sentinels.physics;
 
 import com.google.common.collect.ImmutableList;
 import dev.tom.sentinels.Sentinels;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.entity.CraftBlockDisplay;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Display;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DisplayPhysics {
-
-    private final Display display;
-    private Vector velocity;
 
     private static final double GRAVITY_STRENGTH = 0.04;
 
@@ -36,9 +27,17 @@ public class DisplayPhysics {
     private static final ImmutableList<Direction.Axis> YXZ_AXIS_ORDER = ImmutableList.of(Direction.Axis.Y, Direction.Axis.X, Direction.Axis.Z);
     private static final ImmutableList<Direction.Axis> YZX_AXIS_ORDER = ImmutableList.of(Direction.Axis.Y, Direction.Axis.Z, Direction.Axis.X);
 
+    private final Display display;
+    private final Entity entity;
+    private final Level level;
+
+
+
 
     public DisplayPhysics(Display display) {
         this.display = display;
+        this.entity = ((CraftEntity) this.display).getHandleRaw();
+        this.level = this.entity.level();
         this.velocity = display.getVelocity();
         new BukkitRunnable() {
             @Override
@@ -49,124 +48,157 @@ public class DisplayPhysics {
         }.runTaskTimer(Sentinels.getInstance(), 0, 1);
     }
 
-    public boolean horizontalCollision;
-    public boolean verticalCollision;
-    public boolean verticalCollisionBelow;
-    public boolean minorHorizontalCollision;
+    private Vector velocity;
 
     public void tick() {
         if (display.hasGravity()) {
             velocity.add(new Vector(0, -GRAVITY_STRENGTH, 0));
         }
-        this.move(new Vec3(velocity.getX(), velocity.getY(), velocity.getZ())); // teleports to new lco
-        this.velocity = velocity.clone().multiply(DRAG_COEFFICIENT);
-        this.display.setVelocity(this.velocity); // update x/z velo
-
-        if (velocity.lengthSquared() < 0.001 && !display.hasGravity()) { // If very slow and no gravity, consider it stopped
-            velocity = new Vector(0, 0, 0); // Zero out velocity
-        }
-
+        this.move(toVec3(this.velocity));
+        this.setVelocity(this.velocity.multiply(DRAG_COEFFICIENT));
+        this.display.setVelocity(this.velocity);
     }
 
     private void move(Vec3 movement){
-        Vec3 vec3 = this.collide(movement);
-        double d = vec3.lengthSqr();
-        if (d > 1.0E-7) {
-            Vec3 vec31 = new Vec3(this.display.getX(), this.display.getY(), this.display.getZ());
+        Vec3 collision = this.collide(movement);
+        double collisionSpeedSquare = collision.lengthSqr();
+        if(collisionSpeedSquare > 1.0E-7 && movement.lengthSqr() - collisionSpeedSquare < 1.0E-7) {
+            Vec3 position = entity.position();
 
-            for (Direction.Axis axis : axisStepOrder(vec3)) {
-                double d1 = vec3.get(axis);
+            for (Direction.Axis axis : axisStepOrder(collision)) {
+                double d1 = collision.get(axis);
                 if (d1 != 0.0) {
-                    Vec3 vec32 = vec31.relative(axis.getPositive(), d1);
-                    vec31 = vec32;
+                    position = position.relative(axis.getPositive(), d1);
                 }
             }
-            this.display.teleport(new Location(this.display.getWorld(), vec31.x(), vec31.y(), vec31.z()));
-
-        } else {
-            display.remove();
+            entity.setPosRaw(position.x, position.y, position.z, true);
+            System.out.println(entity.getBoundingBox().getCenter());
+            this.display.teleport(new Location(this.display.getWorld(), position.x, position.y, position.z));
         }
+        boolean xBlocked = movement.x != collision.x;
+        boolean yBlocked = movement.y != collision.y;
+        boolean zBlocked = movement.z != collision.z;
 
-        boolean collidedX = !Mth.equal(movement.x, vec3.x);
-        boolean collidedY = !Mth.equal(movement.y, vec3.y);
-        boolean collidedZ = !Mth.equal(movement.z, vec3.z);
+        double newVx = xBlocked ? 0 : this.velocity.getX();
+        double newVy = yBlocked ? 0 : this.velocity.getY();
+        double newVz = zBlocked ? 0 : this.velocity.getZ();
 
-        this.horizontalCollision = collidedX || collidedZ;
-        this.verticalCollision = collidedY;
-        this.verticalCollisionBelow = this.verticalCollision && movement.y < 0.0;
-
-
-        Vec3 currentVelocity = this.getVelocityVec3();
-
-        double finalVelX = currentVelocity.x();
-        double finalVelY = currentVelocity.y();
-        double finalVelZ = currentVelocity.z();
-
-        if (collidedX) {
-            finalVelX = 0.0;
-        }
-        // If there was a Y collision, zero out Y velocity
-        if (collidedY) {
-            finalVelY = 0.0;
-        }
-        // If there was a Z collision, zero out Z velocity
-        if (collidedZ) {
-            finalVelZ = 0.0;
-        }
-
-        this.setVelocity(finalVelX, finalVelY, finalVelZ);
+        this.setVelocity(newVx, newVy, newVz);
     }
+
 
 
     // Paper start - optimise collisions
     protected Vec3 collide(Vec3 movement) {
-        final boolean xZero = movement.x == 0.0;
-        final boolean yZero = movement.y == 0.0;
-        final boolean zZero = movement.z == 0.0;
-        if (xZero & yZero & zZero) {
+        // no movement so no collisions
+        if (movement.x == 0.0 && movement.y == 0.0 && movement.z == 0.0) {
             return movement;
         }
 
-        final AABB currentBox = toAABB(this.display.getBoundingBox());
+        List<VoxelShape> potentialCollisionsVoxel = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(0);
+        List<AABB> potentialCollisionsBB = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(4);
 
-        final List<VoxelShape> potentialCollisionsVoxel = new ArrayList<>();
-        final List<AABB> potentialCollisionsBB = new ArrayList<>();
+        AABB currBoundingBox = toAABB(this.display.getBoundingBox());
 
-        final AABB expandedCollisionBox;
-        if (xZero & zZero) {
-            // note: xZero & zZero -> collision on x/z == 0 -> no step height calculation
-            // this specifically optimises entities standing still
-            expandedCollisionBox = movement.y < 0.0 ?
-                    ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.cutDownwards(currentBox, movement.y) : ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.cutUpwards(currentBox, movement.y);
-        } else {
-            expandedCollisionBox = currentBox.expandTowards(movement);
+        return this.collideAxis(movement, currBoundingBox, potentialCollisionsVoxel, potentialCollisionsBB);
+    }
+
+    private Vec3 collideAxis(Vec3 movement, AABB currBoundingBox, List<VoxelShape> voxelList, List<AABB> bbList){
+        double x = movement.x;
+        double y = movement.y;
+        double z = movement.z;
+
+        boolean xFirst = !(Math.abs(x) < Math.abs(z)); // Move in the biggest direction first
+
+        if(y != 0){
+            y = this.collideY(currBoundingBox, y, voxelList, bbList);
+            if(y != 0){ // Some vertical movement is possible!
+                // Actually shift the bounding box because the entity has MOVED to this new position
+                currBoundingBox = ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.offsetY(currBoundingBox, y);
+            }
+        }
+        // Z -> X
+        if(!xFirst && z != 0){
+            z = this.collideZ(currBoundingBox, z, voxelList, bbList);
+            if(z != 0){
+                 currBoundingBox = ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.offsetZ(currBoundingBox, z);
+            }
         }
 
-        Entity rawEntity = ((CraftBlockDisplay) this.display).getHandleRaw();
+        if(x != 0) {
+            x = this.collideX(currBoundingBox, x, voxelList, bbList);
+            if(x != 0) {
+                currBoundingBox = ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.offsetX(currBoundingBox, x);
+            }
+        }
+        if(!xFirst && z != 0){
+            z = this.collideZ(currBoundingBox, z, voxelList, bbList);
+        }
 
-        Level level = rawEntity.level();
+        return new Vec3(x,y,z);
+    }
 
-        final List<AABB> entityAABBs = new ArrayList<>();
-        ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.getEntityHardCollisions(
-                level, rawEntity, expandedCollisionBox, entityAABBs, 0, null
-        );
+    private double collideY(AABB currBoundingBox, double y, List<VoxelShape> voxelList, List<AABB> bbList){
+        // Expand bb upwards to check for voxels
+        AABB expandedScanYBox = cutBoundingBoxY(currBoundingBox, y);
+        this.collectCollisions(expandedScanYBox, voxelList, bbList, 0);
+        y = ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.performAABBCollisionsY(currBoundingBox, y, bbList);
+        return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.performVoxelCollisionsY(currBoundingBox, y, voxelList);
+    }
 
+    private double collideX(AABB currBoundingBox, double x, List<VoxelShape> voxelList, List<AABB> bbList){
+        // Expand bb upwards to check for voxels
+        AABB expandedScanXBox = cutBoundingBoxX(currBoundingBox, x);
+        this.collectCollisions(expandedScanXBox, voxelList, bbList, 0);
+        x = ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.performAABBCollisionsX(currBoundingBox, x, bbList);
+        return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.performVoxelCollisionsX(currBoundingBox, x, voxelList);
+    }
+
+    private double collideZ(AABB currBoundingBox, double z, List<VoxelShape> voxelList, List<AABB> bbList){
+        AABB expandedScanZBox = cutBoundingBoxZ(currBoundingBox, z);
+        this.collectCollisions(expandedScanZBox, voxelList, bbList, 0);
+        z = ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.performAABBCollisionsZ(currBoundingBox, z, bbList);
+        return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.performVoxelCollisionsX(currBoundingBox, z, voxelList);
+    }
+
+    private void collectCollisions(AABB collisionBox, List<VoxelShape> voxelList, List<AABB> bbList, int flags) {
+        // Copied from the collide method below
         ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.getCollisionsForBlocksOrWorldBorder(
-                level, rawEntity, expandedCollisionBox, potentialCollisionsVoxel, potentialCollisionsBB,
-                ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.COLLISION_FLAG_CHECK_BORDER | this.getExtraCollisionFlags(),
-                null // Sakura - load chunks on movement
+                this.level, this.entity, collisionBox, voxelList, bbList,
+                flags  | this.getExtraCollisionFlags(), null
         );
-        potentialCollisionsBB.addAll(entityAABBs);
-        potentialCollisionsVoxel.forEach(bb -> {
-            System.out.print(bb.getCoords(Direction.Axis.X));
-        });
-        System.out.println("-------------\n");
 
-        return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.performCollisions(movement, currentBox, potentialCollisionsVoxel, potentialCollisionsBB);
+        ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.getEntityHardCollisions(
+                this.level, this.entity, collisionBox, bbList, 0, null
+        );
     }
 
     private static Iterable<Direction.Axis> axisStepOrder(Vec3 deltaMovement) {
         return Math.abs(deltaMovement.x) < Math.abs(deltaMovement.z) ? YZX_AXIS_ORDER : YXZ_AXIS_ORDER;
+    }
+
+    private static AABB cutBoundingBoxX(AABB bb, double x) {
+        if (x > 0.0) {
+            return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.cutRight(bb, x);
+        } else {
+            return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.cutLeft(bb, x);
+        }
+    }
+
+    private static AABB cutBoundingBoxY(AABB bb, double y) {
+        if (y > 0.0) {
+            return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.cutUpwards(bb, y);
+        } else {
+            return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.cutDownwards(bb, y);
+        }
+    }
+
+    private static AABB cutBoundingBoxZ(AABB bb, double z) {
+        if (z > 0.0) {
+            return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.cutForwards(bb, z);
+        } else {
+            return ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.cutBackwards(bb, z);
+        }
     }
 
     public int getExtraCollisionFlags() {
@@ -182,7 +214,7 @@ public class DisplayPhysics {
         return new Vec3(this.getVelocity().getX(), this.getVelocity().getY(), this.getVelocity().getZ());
     }
 
-    public Vec3 toVelocityVec3(Vector vector){
+    public Vec3 toVec3(Vector vector){
         return new Vec3(vector.getX(), vector.getY(), vector.getZ());
     }
 
