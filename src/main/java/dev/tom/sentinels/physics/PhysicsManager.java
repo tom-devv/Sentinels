@@ -11,7 +11,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -40,13 +43,19 @@ public class PhysicsManager {
 
         // Offset to launch at right hand
         // This means it does NOT align with crosshair
-        Location launchLocation = location.clone().add(-0.7,0.3,0);
+        Location launchLocation = location.clone().add(0.3,0.3,0);
         BlockDisplay display = location.getWorld().spawn(launchLocation, BlockDisplay.class, spawned -> {
-            spawned.setBlock(Material.RED_CANDLE.createBlockData());
-            spawned.setRotation(player.getYaw(), 90);
+            spawned.setBlock(Material.REDSTONE_BLOCK.createBlockData());
+            spawned.setRotation(player.getYaw(), 0);
             spawned.setVelocity(direction.normalize());
             spawned.setTeleportDuration(2);
             spawned.setInterpolationDuration(5);
+            spawned.setTransformation(new Transformation(
+                    new Vector3f(-0.5f, -0.5f, -1f),
+                    new Quaternionf(),
+                    new Vector3f(1,1,1),
+                    new Quaternionf()
+            ));
         });
 
         Optional<PDCTransferResult<T, Entity>> optionalResult = SentinelDataWrapper.getInstance().transferItemPDC(item, display, type);

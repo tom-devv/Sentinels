@@ -47,6 +47,7 @@ public class DisplayPhysics {
         Location newLoc = loc.add(velocity);
 
         display.teleport(newLoc);
+        display.setVelocity(velocity);
 
         if (velocity.lengthSquared() < 0.001 && !display.hasGravity()) { // If very slow and no gravity, consider it stopped
             velocity = new Vector(0, 0, 0); // Zero out velocity

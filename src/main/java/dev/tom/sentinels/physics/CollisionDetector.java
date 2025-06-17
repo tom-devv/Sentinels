@@ -4,12 +4,18 @@ import dev.tom.sentinels.events.EntityCollisionEvent;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +24,7 @@ import java.util.Map;
 public class CollisionDetector {
 
 
-    private static final int NUM_RAYS = 64;
-    private static final double RAY_DISTANCE = 0.7;
+    private static final int NUM_RAYS = 12;
 
     static Vector[] rayDirections = new Vector[NUM_RAYS];
 
@@ -50,11 +55,14 @@ public class CollisionDetector {
                 if(!entity.isValid()) {
                     stopCollisionTask();
                 }
+                double RAY_DISTANCE = calcRayLength();
+                Location currentEntityLocation = entity.getLocation(); // This is typically bottom-center
+                BoundingBox entityWorldBox = entity.getBoundingBox(); // This is the calculated AABB
+                Location rayOrigin = new Location(entity.getWorld(), entity.getBoundingBox().getCenterX(), entity.getBoundingBox().getCenterY(), entity.getBoundingBox().getCenterZ());
                 for (int i = 0; i < rayDirections.length; i++) {
                     Vector rayDirection = rayDirections[i];
-                    Location centerLocation = new Location(entity.getWorld(), entity.getBoundingBox().getCenterX(), entity.getBoundingBox().getCenterY(), entity.getBoundingBox().getCenterZ());
                     RayTraceResult trace = entity.getWorld().rayTraceBlocks(
-                            centerLocation,
+                            rayOrigin,
                             rayDirection,
                             RAY_DISTANCE,
                             FluidCollisionMode.NEVER,
@@ -71,6 +79,12 @@ public class CollisionDetector {
             }
         }.runTaskTimer(this.plugin, 0, 1);
         return collisionTask;
+    }
+
+    private double calcRayLength() {
+        Vector velocity = entity.getVelocity();
+        Vector horizontalMovement = velocity.clone().multiply(new Vector(1,0,1));
+        return horizontalMovement.length() * 0.7;
     }
 
     private void stopCollisionTask() {
