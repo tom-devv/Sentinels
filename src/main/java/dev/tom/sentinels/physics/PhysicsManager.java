@@ -40,10 +40,10 @@ public class PhysicsManager {
 
         // Offset to launch at right hand
         // This means it does NOT align with crosshair
-        Location launchLocation = location.clone().add(-0.7,0.3,0);
+        //-0.7 0.3
+        Location launchLocation = new Location(location.getWorld(), location.getX() - 0.7, location.getY() - 0.3, location.getZ());
         BlockDisplay display = location.getWorld().spawn(launchLocation, BlockDisplay.class, spawned -> {
-            spawned.setBlock(Material.RED_CANDLE.createBlockData());
-            spawned.setRotation(player.getYaw(), 90);
+            spawned.setBlock(Material.GLOWSTONE.createBlockData());
             spawned.setVelocity(direction.normalize());
             spawned.setTeleportDuration(2);
             spawned.setInterpolationDuration(5);
