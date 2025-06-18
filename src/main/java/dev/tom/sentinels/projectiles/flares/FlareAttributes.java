@@ -5,7 +5,6 @@ import dev.tom.sentinels.projectiles.Velocity;
 
 import java.util.UUID;
 
-
 public record FlareAttributes(
         UUID uuid,
         boolean gravity,

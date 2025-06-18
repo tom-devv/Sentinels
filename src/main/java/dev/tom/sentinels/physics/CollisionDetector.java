@@ -1,21 +1,15 @@
 package dev.tom.sentinels.physics;
 
-import dev.tom.sentinels.events.EntityCollisionEvent;
+import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-import org.joml.AxisAngle4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,8 +50,6 @@ public class CollisionDetector {
                     stopCollisionTask();
                 }
                 double RAY_DISTANCE = calcRayLength();
-                Location currentEntityLocation = entity.getLocation(); // This is typically bottom-center
-                BoundingBox entityWorldBox = entity.getBoundingBox(); // This is the calculated AABB
                 Location rayOrigin = new Location(entity.getWorld(), entity.getBoundingBox().getCenterX(), entity.getBoundingBox().getCenterY(), entity.getBoundingBox().getCenterZ());
                 for (int i = 0; i < rayDirections.length; i++) {
                     Vector rayDirection = rayDirections[i];
@@ -71,7 +63,7 @@ public class CollisionDetector {
                     if(trace == null || trace.getHitBlock() == null) continue;
 
                     Block block = trace.getHitBlock();
-                    EntityCollisionEvent event = new EntityCollisionEvent(entity, block, trace.getHitBlockFace());
+                    SentinelProjectileCollideEvent event = new SentinelProjectileCollideEvent(entity, block, trace.getHitBlockFace());
                     plugin.getServer().getPluginManager().callEvent(event);
                     stopCollisionTask();
                     return;

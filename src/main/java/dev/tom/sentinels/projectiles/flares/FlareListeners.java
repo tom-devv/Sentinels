@@ -1,17 +1,16 @@
 package dev.tom.sentinels.projectiles.flares;
 
 import dev.tom.sentinels.data.SentinelDataWrapper;
-import dev.tom.sentinels.events.EntityCollisionEvent;
-import dev.tom.sentinels.data.PDCTransferResult;
-import dev.tom.sentinels.physics.PhysicsManager;
+import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
+import dev.tom.sentinels.events.SentinelProjectileLaunchEvent;
 import dev.tom.sentinels.utils.MobCreator;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -28,15 +27,18 @@ public class FlareListeners implements Listener {
         ItemStack item = e.getItem();
         if(!SentinelDataWrapper.getInstance().isType(item.getItemMeta(), FlareAttributes.class)) return;
         // Not a flare, can't fire
-        Optional<PDCTransferResult<FlareAttributes, FallingBlock>> result = PhysicsManager.getInstance().launchEntity(
-                item,
-                player,
-                FlareAttributes.class
-        );
+        Flare flare = new Flare(item);
+        flare.launch(player.getEyeLocation());
     }
 
     @EventHandler
-    public void entityCollide(EntityCollisionEvent e){
+    public void flareLaunch(SentinelProjectileLaunchEvent e){
+        if(!SentinelDataWrapper.getInstance().isType(e.getEntity(), FlareAttributes.class)) return;
+        Optional<FlareAttributes> optionalAttributes = SentinelDataWrapper.getInstance().loadPDC(e.getEntity(), FlareAttributes.class);
+    }
+
+    @EventHandler
+    public void entityCollide(SentinelProjectileCollideEvent e){
         if(!e.getEntity().isValid()) return;
         Entity entity = e.getEntity();
         if(!SentinelDataWrapper.getInstance().isType(entity, FlareAttributes.class)) return;
@@ -48,5 +50,4 @@ public class FlareListeners implements Listener {
         MobCreator.createAllays(block.getLocation().add(e.getHitBlockFace().getDirection()), block.getLocation(), attributes);
         e.getEntity().remove(); // Remove entity now PDC transferred
     }
-
 }

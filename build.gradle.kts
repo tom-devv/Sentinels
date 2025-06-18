@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     implementation("com.google.code.gson:gson:2.13.1")
-    paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT") // dev bundle for paperweight, includes paper api
+    paperweight.paperDevBundle("1.21.6-R0.1-SNAPSHOT") // dev bundle for paperweight, includes paper api
 }
 
 

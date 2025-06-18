@@ -2,16 +2,11 @@ package dev.tom.sentinels.physics;
 
 import dev.tom.sentinels.Sentinels;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Display;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class DisplayPhysics {
+public class BasicPhysics {
 
     private final Display display;
     private Vector velocity;
@@ -22,7 +17,7 @@ public class DisplayPhysics {
     private static final double DRAG_COEFFICIENT = 0.98F;
 
 
-    public DisplayPhysics(Display display) {
+    public BasicPhysics(Display display) {
         this.display = display;
         this.velocity = display.getVelocity();
         this.collisionDetector = new CollisionDetector(Sentinels.getInstance(), display);
@@ -52,7 +47,6 @@ public class DisplayPhysics {
         if (velocity.lengthSquared() < 0.001 && !display.hasGravity()) { // If very slow and no gravity, consider it stopped
             velocity = new Vector(0, 0, 0); // Zero out velocity
         }
-
     }
 
 

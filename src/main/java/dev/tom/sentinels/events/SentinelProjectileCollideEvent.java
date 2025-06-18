@@ -3,13 +3,11 @@ package dev.tom.sentinels.events;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-public class EntityCollisionEvent extends EntityEvent {
+public class SentinelProjectileCollideEvent extends EntityEvent {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
@@ -17,8 +15,8 @@ public class EntityCollisionEvent extends EntityEvent {
     private final BlockFace hitBlockFace;
 
 
-    public EntityCollisionEvent(Entity flare, Block hitBlock, BlockFace hitBlockFace) {
-        super(flare);
+    public SentinelProjectileCollideEvent(Entity projectile, Block hitBlock, BlockFace hitBlockFace) {
+        super(projectile);
         this.hitBlock = hitBlock;
         this.hitBlockFace = hitBlockFace;
     }
