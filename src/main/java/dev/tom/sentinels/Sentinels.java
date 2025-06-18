@@ -2,7 +2,6 @@ package dev.tom.sentinels;
 
 import dev.tom.sentinels.commands.ProjectileCommand;
 import dev.tom.sentinels.projectiles.shells.ShellListeners;
-import dev.tom.sentinels.projectiles.flares.FlareListeners;
 import dev.tom.sentinels.regions.impl.ProtectedCuboidRegion;
 import dev.tom.sentinels.regions.protection.Barrier;
 import dev.tom.sentinels.regions.protection.BarrierManager;

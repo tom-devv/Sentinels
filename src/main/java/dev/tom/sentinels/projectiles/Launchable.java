@@ -16,6 +16,7 @@ import org.joml.Vector3f;
 
 import java.io.Serializable;
 import java.util.Optional;
+import java.util.Set;
 
 public abstract class Launchable<T extends Serializable> {
 
@@ -25,6 +26,10 @@ public abstract class Launchable<T extends Serializable> {
     public Launchable(ItemStack item, BlockData blockData) {
         this.item = item;
         this.blockData = blockData;
+
+        if (this instanceof LaunchableListener listener) {
+            listener.registerListener(Sentinels.getInstance());
+        }
     }
 
     public final Optional<PDCTransferResult<T, BlockDisplay>> launch(Location location) {
