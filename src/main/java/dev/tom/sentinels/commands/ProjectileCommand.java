@@ -11,6 +11,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.projectiles.flares.Flare;
 import dev.tom.sentinels.projectiles.flares.FlareAttributes;
+import dev.tom.sentinels.projectiles.items.ItemCreator;
 import dev.tom.sentinels.projectiles.shells.ShellAttributes;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -31,12 +32,11 @@ public class ProjectileCommand {
                         .then(Commands.argument("gravity", BoolArgumentType.bool())
                             .executes(ctx -> {
                                 if(!(ctx.getSource().getSender() instanceof Player player)) return 0;
-                                ItemStack arrowItem = ItemStack.of(Material.SPECTRAL_ARROW);
                                 double damage = DoubleArgumentType.getDouble(ctx, "damage");
                                 boolean gravity = BoolArgumentType.getBool(ctx, "gravity");
                                 double radius = DoubleArgumentType.getDouble(ctx, "radius");
                                 ShellAttributes attr = new ShellAttributes(damage, gravity, radius);
-                                SentinelDataWrapper.getInstance().savePDC(arrowItem, attr);
+                                ItemStack arrowItem = new ItemCreator<>(attr).create();
                                 player.getInventory().addItem(arrowItem);
                                 return Command.SINGLE_SUCCESS;
                             })
@@ -50,7 +50,6 @@ public class ProjectileCommand {
                         .then(Commands.argument("velocity", DoubleArgumentType.doubleArg(0.1))
                             .executes(ctx -> {
                                 if(!(ctx.getSource().getSender() instanceof Player player)) return 0;
-                                ItemStack flareItem = ItemStack.of(Material.END_ROD);
                                 int count = IntegerArgumentType.getInteger(ctx, "count");
                                 double health = DoubleArgumentType.getDouble(ctx, "health");
                                 double healing = DoubleArgumentType.getDouble(ctx, "healing");
@@ -58,7 +57,7 @@ public class ProjectileCommand {
                                 int radius = IntegerArgumentType.getInteger(ctx, "radius");
                                 double velocity = DoubleArgumentType.getDouble(ctx, "velocity");
                                 FlareAttributes attr = new FlareAttributes(player.getUniqueId(), gravity, healing, health, count, radius, velocity);
-                                SentinelDataWrapper.getInstance().savePDC(flareItem, attr);
+                                ItemStack flareItem = new ItemCreator<>(attr).create();
                                 player.getInventory().addItem(flareItem);
                                 return Command.SINGLE_SUCCESS;
                             })

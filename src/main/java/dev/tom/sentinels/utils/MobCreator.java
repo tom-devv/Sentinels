@@ -1,7 +1,6 @@
 package dev.tom.sentinels.utils;
 
 import dev.tom.sentinels.ai.AllayRepairGoal;
-import dev.tom.sentinels.projectiles.flares.Flare;
 import dev.tom.sentinels.projectiles.flares.FlareAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,7 +21,7 @@ public class MobCreator {
                 mob.getEquipment().setItemInMainHand(new ItemStack(Material.GLASS));
             });
             allays.add(allay);
-            Bukkit.getMobGoals().addGoal(allay, 0, new AllayRepairGoal(allay, hitBlock, attributes.searchRadius(), attributes.healingPerTick()));
+            Bukkit.getMobGoals().addGoal(allay, 0, new AllayRepairGoal(allay, hitBlock, attributes.searchRadius(), attributes.healing()));
         }
         return allays;
     }

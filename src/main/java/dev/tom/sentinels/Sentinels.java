@@ -1,7 +1,6 @@
 package dev.tom.sentinels;
 
 import dev.tom.sentinels.commands.ProjectileCommand;
-import dev.tom.sentinels.projectiles.shells.ShellListeners;
 import dev.tom.sentinels.regions.impl.ProtectedCuboidRegion;
 import dev.tom.sentinels.regions.protection.Barrier;
 import dev.tom.sentinels.regions.protection.BarrierManager;
@@ -27,8 +26,6 @@ public class Sentinels extends JavaPlugin implements Listener {
             commands.registrar().register(ProjectileCommand.command());
         });
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new ShellListeners(), this);
-        getServer().getPluginManager().registerEvents(new FlareListeners(), this);
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
             spawnCube();

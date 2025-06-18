@@ -3,7 +3,7 @@ package dev.tom.sentinels.projectiles.flares;
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
 import dev.tom.sentinels.events.SentinelProjectileLaunchEvent;
-import dev.tom.sentinels.projectiles.AttributeLaunchable;
+import dev.tom.sentinels.projectiles.Launchable;
 import dev.tom.sentinels.projectiles.LaunchableListener;
 import dev.tom.sentinels.utils.MobCreator;
 import org.bukkit.Bukkit;
@@ -21,7 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Optional;
 
 
-public class Flare extends AttributeLaunchable<FlareAttributes> implements LaunchableListener {
+public class Flare extends Launchable<FlareAttributes> implements LaunchableListener {
 
     public Flare(ItemStack item) {
         super(item, Material.REDSTONE_BLOCK.createBlockData(), FlareAttributes.class);
