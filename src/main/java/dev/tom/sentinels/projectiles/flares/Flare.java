@@ -32,7 +32,6 @@ public class Flare extends Launchable<FlareAttributes> implements LaunchableList
         Bukkit.getPluginManager().registerEvents(new FlareListener(), plugin);
     }
 
-
     private static class FlareListener implements Listener {
         @EventHandler
         public void playerFireFlare(PlayerInteractEvent e){
@@ -41,7 +40,10 @@ public class Flare extends Launchable<FlareAttributes> implements LaunchableList
             if(e.getItem() == null) return;
             Player player = e.getPlayer();
             ItemStack item = e.getItem();
-            if(!SentinelDataWrapper.getInstance().isType(item.getItemMeta(), FlareAttributes.class)) return;
+            if(!SentinelDataWrapper.getInstance().isType(item.getItemMeta(), FlareAttributes.class)) {
+                System.out.println("Not type");
+                return;
+            }
             // Not a flare, can't fire
             Flare flare = new Flare(item);
             flare.launch(player.getEyeLocation());

@@ -3,12 +3,13 @@ package dev.tom.sentinels.projectiles.flares;
 import dev.tom.sentinels.projectiles.Gravity;
 import dev.tom.sentinels.projectiles.ItemSupplier;
 import dev.tom.sentinels.projectiles.Velocity;
+import dev.tom.sentinels.projectiles.items.DisplayInfo;
 import org.bukkit.Material;
 
 import java.util.UUID;
 
 public record FlareAttributes(
-        UUID uuid,
+        @DisplayInfo(ignore = true) UUID uuid,
         boolean gravity,
         double healing,
         double mobHealth,

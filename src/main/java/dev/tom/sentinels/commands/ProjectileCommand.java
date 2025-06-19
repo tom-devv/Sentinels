@@ -8,6 +8,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.tom.sentinels.Sentinels;
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.projectiles.flares.Flare;
 import dev.tom.sentinels.projectiles.flares.FlareAttributes;
@@ -35,8 +36,10 @@ public class ProjectileCommand {
                                 double damage = DoubleArgumentType.getDouble(ctx, "damage");
                                 boolean gravity = BoolArgumentType.getBool(ctx, "gravity");
                                 double radius = DoubleArgumentType.getDouble(ctx, "radius");
-                                ShellAttributes attr = new ShellAttributes(damage, gravity, radius);
-                                ItemStack arrowItem = new ItemCreator<>(attr).create();
+                                ShellAttributes attr = new ShellAttributes(player.getUniqueId(), damage, gravity, radius);
+                                ItemStack arrowItem = ItemStack.of(Material.SPECTRAL_ARROW);
+                                SentinelDataWrapper.getInstance().savePDC(arrowItem, attr);
+//                                ItemStack arrowItem = new ItemCreator<>(attr).create();
                                 player.getInventory().addItem(arrowItem);
                                 return Command.SINGLE_SUCCESS;
                             })

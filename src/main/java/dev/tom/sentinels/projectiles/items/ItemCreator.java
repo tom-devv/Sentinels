@@ -9,16 +9,19 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.inventory.ItemStack;
 
+
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
 import static net.kyori.adventure.text.format.TextColor.color;
 
-
-public class ItemCreator<T extends Record & Serializable & ItemSupplier> {
+public class ItemCreator<T extends Serializable & ItemSupplier> {
 
     private final T supplier;
 
@@ -31,6 +34,10 @@ public class ItemCreator<T extends Record & Serializable & ItemSupplier> {
         itemStack.editMeta(meta -> {
             meta.lore(getLore());
         });
+        final Component component = text()
+                .content("Hello").color(color(0x13f832))
+                .append(text(" world!", GREEN))
+                .build();
 
         SentinelDataWrapper.getInstance().savePDC(itemStack, supplier);
         return itemStack;
@@ -49,7 +56,7 @@ public class ItemCreator<T extends Record & Serializable & ItemSupplier> {
             } catch (IllegalAccessException | InvocationTargetException e) {
                 System.err.println("Error accessing ItemSupplier: " + supplier.getClass().getName() + " field: " + name);
                 lore.add(
-                        Component.text()
+                        text()
                         .content("Failed to resolve lore")
                         .color(NamedTextColor.RED)
                         .decoration(TextDecoration.BOLD, true)
@@ -57,39 +64,56 @@ public class ItemCreator<T extends Record & Serializable & ItemSupplier> {
                 );
                 continue;
             }
-            Component loreComponent = parseValue(name, value);
-            lore.add(loreComponent);
+            Component loreComponent = parseValue(recordComponent, value);
+            if(loreComponent != null){
+                loreComponent.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+                lore.add(loreComponent);
+            }
         }
         return lore;
     }
 
-    private Component parseValue(String rawName, Object value){
-        String fieldName = TextUtil.upperCaseFirstLetter(rawName).strip();
-        TextComponent.Builder builder = Component.text()
+
+    private Component parseValue(RecordComponent component, Object value){
+        DisplayInfo info = component.getAnnotation(DisplayInfo.class);
+        String fieldName = getPrettyFieldName(component, info);
+        TextComponent.Builder builder = text()
                 .content(fieldName).color(color(0x3768db))
-                .append(Component.text(": ").color(NamedTextColor.GRAY));
+                .append(text(": ").color(NamedTextColor.GRAY));
         if (value instanceof Boolean boolValue) {
-            builder.append(Component.text(boolValue ? "Yes" : "No").color(boolValue ? NamedTextColor.GREEN : NamedTextColor.RED));
+            builder.append(text(boolValue ? "Yes" : "No").color(boolValue ? GREEN : NamedTextColor.RED));
         } else if (value == null) {
-            builder.append(Component.text("N/A").color(NamedTextColor.DARK_GRAY));
+            builder.append(text("N/A").color(NamedTextColor.DARK_GRAY));
         } else {
-            builder.append(Component.text(value.toString()).color(NamedTextColor.WHITE));
+            builder.append(text(value.toString()).color(NamedTextColor.WHITE));
         }
 
-        String unit = switch (rawName) {
-            case "radius" -> "m";
-            case "velocity" -> "m/t";
-            case "healing" -> "hp/t";
-            default -> null;
-        };
+        String unit = info.unit();
 
-        if(unit != null){
-            builder.append(Component.text(unit).color(NamedTextColor.WHITE));
+        if(unit != null && !unit.isEmpty()) {
+            builder.append(text(unit).color(NamedTextColor.WHITE));
         }
 
         return builder.build();
     }
 
+
+    /**
+     * Get a pretty field name from a component either from its
+     * annotation or by its field name
+     * @param component
+     * @param info
+     * @return pretty field name
+     */
+    private String getPrettyFieldName(RecordComponent component, DisplayInfo info){
+        String fieldName = TextUtil.prettyFieldName(component.getName());
+
+        // display name set via annotation
+        if(info != null && !info.name().equalsIgnoreCase("")) {
+            fieldName = info.name();
+        }
+        return fieldName;
+    }
 
 
 
