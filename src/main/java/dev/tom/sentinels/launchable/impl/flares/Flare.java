@@ -1,10 +1,10 @@
-package dev.tom.sentinels.projectiles.flares;
+package dev.tom.sentinels.launchable.impl.flares;
 
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
 import dev.tom.sentinels.events.SentinelProjectileLaunchEvent;
-import dev.tom.sentinels.projectiles.Launchable;
-import dev.tom.sentinels.projectiles.LaunchableListener;
+import dev.tom.sentinels.launchable.AbstractLaunchable;
+import dev.tom.sentinels.launchable.LaunchableListener;
 import dev.tom.sentinels.utils.MobCreator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -16,23 +16,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Optional;
 
 
-public class Flare extends Launchable<FlareAttributes> implements LaunchableListener {
+public class Flare extends AbstractLaunchable<FlareAttributes>  {
 
     public Flare(ItemStack item) {
         super(item, Material.REDSTONE_BLOCK.createBlockData(), FlareAttributes.class);
     }
 
-    @Override
-    public void registerListener(JavaPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new FlareListener(), plugin);
-    }
+    private static class FlareListener implements LaunchableListener {
 
-    private static class FlareListener implements Listener {
         @EventHandler
         public void playerFireFlare(PlayerInteractEvent e){
             // Only fire when interacting with air
@@ -47,6 +42,7 @@ public class Flare extends Launchable<FlareAttributes> implements LaunchableList
             // Not a flare, can't fire
             Flare flare = new Flare(item);
             flare.launch(player.getEyeLocation());
+            System.out.println("Launched");
         }
 
         @EventHandler

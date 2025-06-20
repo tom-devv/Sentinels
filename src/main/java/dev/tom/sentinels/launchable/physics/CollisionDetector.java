@@ -1,4 +1,4 @@
-package dev.tom.sentinels.physics;
+package dev.tom.sentinels.launchable.physics;
 
 import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
 import org.bukkit.FluidCollisionMode;

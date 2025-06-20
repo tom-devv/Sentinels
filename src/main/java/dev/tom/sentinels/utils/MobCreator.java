@@ -1,7 +1,7 @@
 package dev.tom.sentinels.utils;
 
 import dev.tom.sentinels.ai.AllayRepairGoal;
-import dev.tom.sentinels.projectiles.flares.FlareAttributes;
+import dev.tom.sentinels.launchable.impl.flares.FlareAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

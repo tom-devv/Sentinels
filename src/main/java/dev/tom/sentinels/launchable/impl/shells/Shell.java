@@ -1,14 +1,10 @@
-package dev.tom.sentinels.projectiles.shells;
+package dev.tom.sentinels.launchable.impl.shells;
 
-import dev.tom.sentinels.Sentinels;
 import dev.tom.sentinels.data.SentinelDataWrapper;
-import dev.tom.sentinels.projectiles.ItemSupplier;
-import dev.tom.sentinels.projectiles.Launchable;
-import dev.tom.sentinels.projectiles.LaunchableListener;
+import dev.tom.sentinels.launchable.AbstractLaunchable;
+import dev.tom.sentinels.launchable.LaunchableListener;
 import dev.tom.sentinels.regions.protection.Barrier;
 import dev.tom.sentinels.regions.protection.BarrierManager;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -20,25 +16,18 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class Shell extends Launchable<ShellAttributes> implements LaunchableListener {
+public class Shell extends AbstractLaunchable<ShellAttributes>  {
 
     public Shell(ItemStack item, BlockData blockData, Class<ShellAttributes> type) {
         super(item, blockData, type);
     }
 
-    @Override
-    public void registerListener(JavaPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new ShellListeners(), Sentinels.getInstance());
-    }
-
-
-    private static class ShellListeners implements Listener {
+    private static class ShellListeners implements LaunchableListener {
         @EventHandler
         public void projectileExplosion(EntityExplodeEvent e){
             if(!(e.getEntity() instanceof TNTPrimed tnt)) return;

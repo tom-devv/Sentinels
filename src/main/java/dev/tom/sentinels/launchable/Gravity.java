@@ -1,4 +1,4 @@
-package dev.tom.sentinels.projectiles;
+package dev.tom.sentinels.launchable;
 
 public interface Gravity {
 

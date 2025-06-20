@@ -1,16 +1,13 @@
-package dev.tom.sentinels.projectiles;
+package dev.tom.sentinels.launchable;
 
 import dev.tom.sentinels.Sentinels;
 import dev.tom.sentinels.data.PDCTransferResult;
 import dev.tom.sentinels.data.SentinelDataWrapper;
-import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
 import dev.tom.sentinels.events.SentinelProjectileLaunchEvent;
-import dev.tom.sentinels.physics.BasicPhysics;
-import net.kyori.adventure.text.Component;
+import dev.tom.sentinels.launchable.physics.BasicPhysics;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.Display;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
@@ -21,35 +18,34 @@ import org.joml.Vector3f;
 import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Optional;
-import java.util.Set;
 
 import static net.kyori.adventure.text.Component.text;
 
-public abstract class Launchable<T extends Serializable> {
+public abstract class AbstractLaunchable<T extends Serializable> {
 
     protected final ItemStack item;
     protected final BlockData blockData;
     protected final Class<T> type;
 
-    public Launchable(ItemStack item, @NotNull BlockData blockData, @NotNull Class<T> type) {
+    public AbstractLaunchable(ItemStack item, @NotNull BlockData blockData, @NotNull Class<T> type) {
         this.blockData = blockData;
         this.type = type;
         this.item = item;
-        if (this instanceof LaunchableListener listener) {
-            listener.registerListener(Sentinels.getInstance());
-        }
     }
 
     protected @Nullable BlockDisplay display;
 
     public final Optional<PDCTransferResult<T, BlockDisplay>> launch(Location location) {
         this.display = createDisplay(location);
-
-        if(!callEvent()) {
+        if(callEvent()) { // cancelled
             return Optional.empty();
         }
+
+        // we must handle attributes first before physics init
+        // because attributes may change entity attributes
+        Optional<PDCTransferResult<T, BlockDisplay>> result = handleAttributes();
         initPhysics();
-        return handleAttributes();
+        return result;
     }
 
     protected Optional<PDCTransferResult<T, BlockDisplay>> handleAttributes() {
@@ -64,7 +60,6 @@ public abstract class Launchable<T extends Serializable> {
                 display.setVelocity(display.getVelocity().multiply(velocityAttributes.velocity()));
             }
 
-            @SuppressWarnings("unchecked")
             Optional<PDCTransferResult<T, BlockDisplay>> finalResult = Optional.of(
                     new PDCTransferResult<>(attributes, display)
             );

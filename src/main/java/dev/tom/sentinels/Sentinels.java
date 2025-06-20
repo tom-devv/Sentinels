@@ -1,9 +1,10 @@
 package dev.tom.sentinels;
 
 import dev.tom.sentinels.commands.ProjectileCommand;
-import dev.tom.sentinels.projectiles.flares.Flare;
-import dev.tom.sentinels.projectiles.shells.Shell;
-import dev.tom.sentinels.projectiles.shells.ShellAttributes;
+import dev.tom.sentinels.launchable.ListenerRegister;
+import dev.tom.sentinels.launchable.impl.flares.Flare;
+import dev.tom.sentinels.launchable.impl.shells.Shell;
+import dev.tom.sentinels.launchable.impl.shells.ShellAttributes;
 import dev.tom.sentinels.regions.impl.ProtectedCuboidRegion;
 import dev.tom.sentinels.regions.protection.Barrier;
 import dev.tom.sentinels.regions.protection.BarrierManager;
@@ -36,8 +37,7 @@ public class Sentinels extends JavaPlugin implements Listener {
             spawnCube();
         }, 20 * 3);
 
-        new Flare(ItemStack.of(Material.GLOWSTONE));
-        new Shell(ItemStack.of(Material.GLOWSTONE), Material.GLOWSTONE.createBlockData(), ShellAttributes.class);
+        ListenerRegister.register(this);
     }
 
     public void spawnCube() {

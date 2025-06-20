@@ -8,15 +8,11 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.tom.sentinels.Sentinels;
-import dev.tom.sentinels.data.SentinelDataWrapper;
-import dev.tom.sentinels.projectiles.flares.Flare;
-import dev.tom.sentinels.projectiles.flares.FlareAttributes;
-import dev.tom.sentinels.projectiles.items.ItemCreator;
-import dev.tom.sentinels.projectiles.shells.ShellAttributes;
+import dev.tom.sentinels.launchable.impl.flares.FlareAttributes;
+import dev.tom.sentinels.launchable.items.ItemCreator;
+import dev.tom.sentinels.launchable.impl.shells.ShellAttributes;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,9 +33,7 @@ public class ProjectileCommand {
                                 boolean gravity = BoolArgumentType.getBool(ctx, "gravity");
                                 double radius = DoubleArgumentType.getDouble(ctx, "radius");
                                 ShellAttributes attr = new ShellAttributes(player.getUniqueId(), damage, gravity, radius);
-                                ItemStack arrowItem = ItemStack.of(Material.SPECTRAL_ARROW);
-                                SentinelDataWrapper.getInstance().savePDC(arrowItem, attr);
-//                                ItemStack arrowItem = new ItemCreator<>(attr).create();
+                                ItemStack arrowItem = new ItemCreator<>(attr).create();
                                 player.getInventory().addItem(arrowItem);
                                 return Command.SINGLE_SUCCESS;
                             })
