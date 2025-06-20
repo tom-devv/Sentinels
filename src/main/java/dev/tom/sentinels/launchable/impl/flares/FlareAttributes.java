@@ -18,10 +18,10 @@ public record FlareAttributes(
         @FieldInfo(ignore = true) UUID uuid,
         boolean gravity,
         double healing,
-        double mobHealth,
-        int mobCount,
+        @FieldInfo(name = "Allay Health") double mobHealth,
+        @FieldInfo(name = "Allays") int mobCount,
         int searchRadius,
-        double velocity
+        @FieldInfo(unit = "m/s") double speed
 ) implements Gravity, Velocity, java.io.Serializable, ItemSupplier {
 
     @Override
@@ -31,7 +31,7 @@ public record FlareAttributes(
 
     @Override
     public double velocity() {
-        return this.velocity;
+        return this.speed;
     }
 
     @Override
@@ -44,8 +44,9 @@ public record FlareAttributes(
         return TextUtil.asComponent(
                 "<white>Launch this flare</white>",
                 "<white>to summon a really of <blue>allays</blue></white>",
-                "<white>These helpful <blue>allays</blue> will <green>repair</green>>/white>",
-                "<white>your barriers until they are fully restored</white>"
+                "<white>These helpful <blue>allays</blue> will <green>repair</green></white>",
+                "<white>your barriers until they are fully restored</white>",
+                ""
         );
     }
 

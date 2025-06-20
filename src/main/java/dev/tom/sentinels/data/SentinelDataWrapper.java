@@ -29,6 +29,11 @@ public class SentinelDataWrapper {
         return INSTANCE;
     }
 
+    /**
+     * If fetching attributes, consider the following.
+     * Use {@link #loadPDC(PersistentDataHolder, Class)} and assign a variable inside an if stmt e.g.
+     * if ((optionalData = SentinelDataWrapper.getInstance().loadPDC(entity, ShellAttributes.class)).isEmpty()) return;
+     */
     public <T extends Serializable, P extends PersistentDataHolder> boolean isType(P holder, Class<T> type){
         Optional<T> optionalData = loadPDC(holder, type);
         return optionalData.isPresent();
@@ -56,6 +61,10 @@ public class SentinelDataWrapper {
         }
         holder.getPersistentDataContainer().set(key, PersistentDataType.BYTE_ARRAY, bytes);
         return holder;
+    }
+
+    public <T extends Serializable> Optional<T> loadPDC(ItemStack item, Class<T> type) {
+        return loadPDC(item.getItemMeta(), type);
     }
 
 

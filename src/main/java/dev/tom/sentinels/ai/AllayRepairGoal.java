@@ -4,6 +4,7 @@ import com.destroystokyo.paper.entity.ai.Goal;
 import com.destroystokyo.paper.entity.ai.GoalKey;
 import com.destroystokyo.paper.entity.ai.GoalType;
 import dev.tom.sentinels.Sentinels;
+import dev.tom.sentinels.launchable.impl.flares.FlareAttributes;
 import dev.tom.sentinels.regions.protection.Barrier;
 import dev.tom.sentinels.regions.protection.BarrierManager;
 import dev.tom.sentinels.utils.BlockUtil;
@@ -21,21 +22,19 @@ public class AllayRepairGoal implements Goal<Allay> {
     private GoalKey<Allay> key = GoalKey.of(Allay.class, new NamespacedKey(Sentinels.getInstance(), "barrier_repair_goal"));
     private final Allay allay;
     private final Location initBlock;
-    private final int radius;
-    private final double healingPerTick;
+    private final FlareAttributes attributes;
 
-    public AllayRepairGoal(Allay mob, Location initBlock, int radius, double healingPerTick) {
+    public AllayRepairGoal(Allay mob, Location initBlock, FlareAttributes attributes) {
         this.allay = mob;
         this.initBlock = initBlock;
-        this.radius = radius;
-        this.healingPerTick = healingPerTick;
+        this.attributes = attributes;
     }
 
     private Goal goal = null;
     private Optional<Barrier> findClosestDamagedBarrier() {
         BarrierManager manager = BarrierManager.getInstance();
         List<Barrier> brokenBarriers = new ArrayList<>();
-        for (Block block : BlockUtil.getBlocksInRadius(initBlock, radius)) {
+        for (Block block : BlockUtil.getBlocksInRadius(initBlock, attributes.searchRadius())) {
             Barrier barrier = manager.getBarrier(block.getLocation());
             if (barrier == null || barrier.isDead() || barrier.isMaxHealth()) continue;
             brokenBarriers.add(barrier);
@@ -84,7 +83,7 @@ public class AllayRepairGoal implements Goal<Allay> {
         allay.getPathfinder().moveTo(block.getLocation());
         double dist = allay.getLocation().distance(block.getLocation());
         if(dist <= 1){
-            goal.barrier().repair(healingPerTick);
+            goal.barrier().repair(attributes.healing());
             block.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, goal.barrier().getLocation(), 3, 0.3,0.5,0.3);
         }
     }

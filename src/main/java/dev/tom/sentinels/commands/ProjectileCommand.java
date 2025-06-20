@@ -23,21 +23,25 @@ public class ProjectileCommand {
 
     private static LiteralArgumentBuilder<CommandSourceStack> builder() {
         return Commands.literal("projectile")
-                .then(Commands.literal("arrow")
+                .then(Commands.literal("shell")
                         .then(Commands.argument("damage", DoubleArgumentType.doubleArg(0.1))
                         .then(Commands.argument("radius", DoubleArgumentType.doubleArg(0.1))
                         .then(Commands.argument("gravity", BoolArgumentType.bool())
+                        .then(Commands.argument("speed", DoubleArgumentType.doubleArg(0.1))
+                        .then(Commands.argument("knockback", DoubleArgumentType.doubleArg(0))
                             .executes(ctx -> {
                                 if(!(ctx.getSource().getSender() instanceof Player player)) return 0;
                                 double damage = DoubleArgumentType.getDouble(ctx, "damage");
                                 boolean gravity = BoolArgumentType.getBool(ctx, "gravity");
                                 double radius = DoubleArgumentType.getDouble(ctx, "radius");
-                                ShellAttributes attr = new ShellAttributes(player.getUniqueId(), damage, gravity, radius);
+                                double speed = DoubleArgumentType.getDouble(ctx, "speed");
+                                double knockback = DoubleArgumentType.getDouble(ctx, "knockback");
+                                ShellAttributes attr = new ShellAttributes(player.getUniqueId(), damage, speed, gravity, radius, knockback);
                                 ItemStack arrowItem = new ItemCreator<>(attr).create();
                                 player.getInventory().addItem(arrowItem);
                                 return Command.SINGLE_SUCCESS;
                             })
-                ))))
+                ))))))
                 .then(Commands.literal("flare")
                         .then(Commands.argument("count", IntegerArgumentType.integer(1))
                         .then(Commands.argument("health", DoubleArgumentType.doubleArg(0.1))

@@ -1,29 +1,58 @@
 package dev.tom.sentinels.launchable.impl.flares;
 
+import dev.tom.sentinels.ai.AllayRepairGoal;
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
-import dev.tom.sentinels.events.SentinelProjectileLaunchEvent;
 import dev.tom.sentinels.launchable.AbstractLaunchable;
 import dev.tom.sentinels.launchable.LaunchableListener;
-import dev.tom.sentinels.utils.MobCreator;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Allay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 
 
 public class Flare extends AbstractLaunchable<FlareAttributes>  {
 
     public Flare(ItemStack item) {
         super(item, Material.REDSTONE_BLOCK.createBlockData(), FlareAttributes.class);
+    }
+
+    /**
+     * Create allays with goals to repair barriers
+     * @param adjacent location adjacent to the hit block (outside the barrier)
+     * @param hitBlock the block the flare collided with
+     * @param attributes
+     * @return
+     */
+    protected static Set<Allay> createAllays(Vector direction, Location hitBlock, FlareAttributes attributes) {
+        Set<Allay> allays = new HashSet<>();
+
+        double distanceFromBarrier = 5;
+        direction = direction.normalize().multiply(distanceFromBarrier);
+        Location spawn = hitBlock.clone().add(direction);
+        for (int i = 0; i < attributes.mobCount(); i++) {
+            Allay allay = spawn.getWorld().spawn(spawn, Allay.class, mob -> {
+                mob.setCanPickupItems(false);
+                mob.setCollidable(true);
+                mob.getEquipment().setItemInMainHand(new ItemStack(Material.GLASS));
+            });
+            allays.add(allay);
+            Bukkit.getMobGoals().addGoal(allay, 0, new AllayRepairGoal(allay, hitBlock, attributes));
+        }
+        return allays;
     }
 
     private static class FlareListener implements LaunchableListener {
@@ -36,33 +65,23 @@ public class Flare extends AbstractLaunchable<FlareAttributes>  {
             Player player = e.getPlayer();
             ItemStack item = e.getItem();
             if(!SentinelDataWrapper.getInstance().isType(item.getItemMeta(), FlareAttributes.class)) {
-                System.out.println("Not type");
                 return;
             }
             // Not a flare, can't fire
             Flare flare = new Flare(item);
             flare.launch(player.getEyeLocation());
-            System.out.println("Launched");
-        }
-
-        @EventHandler
-        public void flareLaunch(SentinelProjectileLaunchEvent e){
-            if(!SentinelDataWrapper.getInstance().isType(e.getEntity(), FlareAttributes.class)) return;
-            Optional<FlareAttributes> optionalAttributes = SentinelDataWrapper.getInstance().loadPDC(e.getEntity(), FlareAttributes.class);
         }
 
         @EventHandler
         public void entityCollide(SentinelProjectileCollideEvent e){
             if(!e.getEntity().isValid()) return;
             Entity entity = e.getEntity();
-            if(!SentinelDataWrapper.getInstance().isType(entity, FlareAttributes.class)) return;
-            // Flares only
-            Optional<FlareAttributes> optionalAttributes = SentinelDataWrapper.getInstance().loadPDC(entity, FlareAttributes.class);
-            if(optionalAttributes.isEmpty()) return;
+            Optional<FlareAttributes> optionalAttributes;
+            if((optionalAttributes = SentinelDataWrapper.getInstance().loadPDC(entity, FlareAttributes.class)).isEmpty()) return;
             FlareAttributes attributes = optionalAttributes.get();
             Block block = e.getHitBlock();
-            MobCreator.createAllays(block.getLocation().add(e.getHitBlockFace().getDirection()), block.getLocation(), attributes);
-            e.getEntity().remove(); // Remove entity now PDC transferred
+            Flare.createAllays(e.getHitBlockFace().getDirection(), block.getLocation(), attributes);
+            e.getEntity().remove();
         }
     }
 }

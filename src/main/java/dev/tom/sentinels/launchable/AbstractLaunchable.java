@@ -49,6 +49,11 @@ public abstract class AbstractLaunchable<T extends Serializable> {
     }
 
     protected Optional<PDCTransferResult<T, BlockDisplay>> handleAttributes() {
+        if(display == null) {
+            System.err.println("Failed to transfer PDC, BlockDisplay is null");
+            System.err.println(this.blockData + " " + this.type + " " + this.item);
+            return Optional.empty();
+        }
         Optional<PDCTransferResult<T, BlockDisplay>> optionalResult = SentinelDataWrapper.getInstance().transferItemPDC(this.item, display, type);
         if (optionalResult.isPresent()) {
             T attributes = optionalResult.get().data();
@@ -60,10 +65,9 @@ public abstract class AbstractLaunchable<T extends Serializable> {
                 display.setVelocity(display.getVelocity().multiply(velocityAttributes.velocity()));
             }
 
-            Optional<PDCTransferResult<T, BlockDisplay>> finalResult = Optional.of(
+            return Optional.of(
                     new PDCTransferResult<>(attributes, display)
             );
-            return finalResult;
         } else {
             // Should never fire
             System.err.println("Failed to transfer PDC for ItemStack: " + item);
@@ -71,7 +75,7 @@ public abstract class AbstractLaunchable<T extends Serializable> {
         }
     }
 
-    private BlockDisplay createDisplay(Location location) {
+    private @NotNull BlockDisplay createDisplay(Location location) {
         Vector direction = location.getDirection();
         return location.getWorld().spawn(location, BlockDisplay.class, entity -> {
             entity.setBlock(blockData);
