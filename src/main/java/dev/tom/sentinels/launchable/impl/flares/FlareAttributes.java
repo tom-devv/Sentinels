@@ -4,6 +4,7 @@ import dev.tom.sentinels.launchable.Gravity;
 import dev.tom.sentinels.launchable.ItemSupplier;
 import dev.tom.sentinels.launchable.Velocity;
 import dev.tom.sentinels.launchable.items.FieldInfo;
+import dev.tom.sentinels.utils.TextUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
@@ -40,18 +41,11 @@ public record FlareAttributes(
 
     @Override
     public List<Component> prefixLoreComponent() {
-        MiniMessage mm = MiniMessage.miniMessage();
-        String string = """
-                <white>Launch this flare<newline>
-                to summon a rally of <blue>allays</blue>.<newline>
-                These helpful <blue>allays</blue> will help<newline>
-                to repair your barriers until they are killed!<newline>
-                </white>
-                """;
-        return List.of(
-                mm.deserialize(
-                        string
-                )
+        return TextUtil.asComponent(
+                "<white>Launch this flare</white>",
+                "<white>to summon a really of <blue>allays</blue></white>",
+                "<white>These helpful <blue>allays</blue> will <green>repair</green>>/white>",
+                "<white>your barriers until they are fully restored</white>"
         );
     }
 
