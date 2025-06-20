@@ -1,8 +1,8 @@
 package dev.tom.sentinels.launchable.impl.flares;
 
-import dev.tom.sentinels.launchable.Gravity;
+import dev.tom.sentinels.launchable.attributes.Gravity;
 import dev.tom.sentinels.launchable.ItemSupplier;
-import dev.tom.sentinels.launchable.Velocity;
+import dev.tom.sentinels.launchable.attributes.Velocity;
 import dev.tom.sentinels.launchable.items.FieldInfo;
 import dev.tom.sentinels.utils.TextUtil;
 import net.kyori.adventure.text.Component;
@@ -21,19 +21,8 @@ public record FlareAttributes(
         @FieldInfo(name = "Allay Health") double mobHealth,
         @FieldInfo(name = "Allays") int mobCount,
         int searchRadius,
-        @FieldInfo(unit = "m/s") double speed
+        @FieldInfo(name = "speed", unit = "m/s") double velocity
 ) implements Gravity, Velocity, java.io.Serializable, ItemSupplier {
-
-    @Override
-    public boolean gravity() {
-        return this.gravity;
-    }
-
-    @Override
-    public double velocity() {
-        return this.speed;
-    }
-
     @Override
     public Component nameComponent() {
         return MiniMessage.miniMessage().deserialize("<green>Flare</green>");

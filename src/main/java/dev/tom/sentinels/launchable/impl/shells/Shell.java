@@ -10,14 +10,12 @@ import dev.tom.sentinels.launchable.impl.flares.Flare;
 import dev.tom.sentinels.launchable.impl.flares.FlareAttributes;
 import dev.tom.sentinels.regions.protection.Barrier;
 import dev.tom.sentinels.regions.protection.BarrierManager;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -27,6 +25,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,26 +35,14 @@ public class Shell extends AbstractLaunchable<ShellAttributes>  {
 
     private final ShellAttributes attributes;
 
-    public Shell(ItemStack item, Class<ShellAttributes> type) {
-        super(item, Material.TNT.createBlockData(), type);
+    public Shell(ItemStack item) {
+        super(item, Material.TNT.createBlockData(), ShellAttributes.class);
         Optional<ShellAttributes> opt = SentinelDataWrapper.getInstance().loadPDC(item, ShellAttributes.class);
         if(opt.isEmpty()){
             throw new RuntimeException("Could not load attributes from item: " + item + " " + type);
         } else {
             attributes = opt.get();
         }
-    }
-
-    private void recoil(Player player) {
-        Entity vehicle;
-        if(player.isInsideVehicle()) {
-            vehicle = player.getVehicle();
-        } else {
-            vehicle = player;
-        }
-        Vector direction = player.getEyeLocation().getDirection().normalize();
-        Vector opposite = direction.multiply(-1);
-        vehicle.setVelocity(opposite.multiply(attributes.knockback()));
     }
 
     private static class ShellListeners implements LaunchableListener {
@@ -107,9 +94,8 @@ public class Shell extends AbstractLaunchable<ShellAttributes>  {
                 return;
             }
             // Not a flare, can't fire
-            Shell shell = new Shell(item, ShellAttributes.class);
-            shell.launch(player.getEyeLocation());
-            shell.recoil(player);
+            Shell shell = new Shell(item);
+            shell.launch(player.getEyeLocation(), player);
         }
 
     }

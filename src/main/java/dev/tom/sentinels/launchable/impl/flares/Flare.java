@@ -75,7 +75,7 @@ public class Flare extends AbstractLaunchable<FlareAttributes>  {
             }
             // Not a flare, can't fire
             Flare flare = new Flare(item);
-            flare.launch(player.getEyeLocation());
+            flare.launch(player.getEyeLocation(), player);
         }
 
         @EventHandler

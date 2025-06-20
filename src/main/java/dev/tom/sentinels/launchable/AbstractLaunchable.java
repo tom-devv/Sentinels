@@ -4,10 +4,16 @@ import dev.tom.sentinels.Sentinels;
 import dev.tom.sentinels.data.PDCTransferResult;
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.events.SentinelProjectileLaunchEvent;
+import dev.tom.sentinels.launchable.attributes.Gravity;
+import dev.tom.sentinels.launchable.attributes.Knockback;
+import dev.tom.sentinels.launchable.attributes.Velocity;
 import dev.tom.sentinels.launchable.physics.BasicPhysics;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
@@ -18,6 +24,7 @@ import org.joml.Vector3f;
 import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -35,21 +42,33 @@ public abstract class AbstractLaunchable<T extends Serializable> {
 
     protected @Nullable BlockDisplay display;
 
-    public final Optional<PDCTransferResult<T, BlockDisplay>> launch(Location location) {
+
+    /**
+     * Launch a display as/from a player
+     *
+     * @param location where to launch
+     * @param player   null unless a player is launching
+     * @return optional transfer result
+     */
+    public final Optional<PDCTransferResult<T, BlockDisplay>> launch(Location location, @Nullable Player player) {
         this.display = createDisplay(location);
-        if(callEvent()) { // cancelled
+        if (callEvent()) { // cancelled
             return Optional.empty();
         }
 
         // we must handle attributes first before physics init
         // because attributes may change entity attributes
-        Optional<PDCTransferResult<T, BlockDisplay>> result = handleAttributes();
+        Optional<PDCTransferResult<T, BlockDisplay>> result = handleAttributes(player);
         initPhysics();
         return result;
     }
 
-    protected Optional<PDCTransferResult<T, BlockDisplay>> handleAttributes() {
-        if(display == null) {
+    public final Optional<PDCTransferResult<T, BlockDisplay>> launch(Location location) {
+        return launch(location, null);
+    }
+
+    protected Optional<PDCTransferResult<T, BlockDisplay>> handleAttributes(Player player) {
+        if (display == null) {
             System.err.println("Failed to transfer PDC, BlockDisplay is null");
             System.err.println(this.blockData + " " + this.type + " " + this.item);
             return Optional.empty();
@@ -58,11 +77,14 @@ public abstract class AbstractLaunchable<T extends Serializable> {
         if (optionalResult.isPresent()) {
             T attributes = optionalResult.get().data();
 
-            if (attributes instanceof Gravity gravityAttributes) {
-                display.setGravity(gravityAttributes.gravity());
+            if (attributes instanceof Gravity gravity) {
+                display.setGravity(gravity.gravity());
             }
-            if(attributes instanceof Velocity velocityAttributes) {
-                display.setVelocity(display.getVelocity().multiply(velocityAttributes.velocity()));
+            if (attributes instanceof Velocity velocity) {
+                display.setVelocity(display.getVelocity().multiply(velocity.velocity()));
+            }
+            if (attributes instanceof Knockback knockback && player != null) {
+                knockback(player, knockback.knockback());
             }
 
             return Optional.of(
@@ -75,22 +97,42 @@ public abstract class AbstractLaunchable<T extends Serializable> {
         }
     }
 
-    private @NotNull BlockDisplay createDisplay(Location location) {
+    protected @NotNull BlockDisplay createDisplay(Location location, final @Nullable Consumer<? super BlockDisplay> function) {
         Vector direction = location.getDirection();
-        return location.getWorld().spawn(location, BlockDisplay.class, entity -> {
-            entity.setBlock(blockData);
-            entity.setRotation(location.getYaw(), location.getPitch());
-            entity.setVelocity(direction.normalize());
-            entity.setTeleportDuration(2);
-            entity.setInterpolationDuration(5);
-            entity.setTransformation(new Transformation(
+        BlockDisplay display = location.getWorld().spawn(location, BlockDisplay.class, function);
+        setDisplayBasics(display);
+        return display;
+    }
+
+    protected Consumer<? super BlockDisplay> defaultDisplaySettings(Location location) {
+        Vector direction = location.getDirection();
+        return display -> {
+            display.setRotation(location.getYaw(), location.getPitch());
+            display.setVelocity(direction.normalize());
+            display.setTransformation(new Transformation(
                     new Vector3f(-0.5f, -0.5f, -1f),
                     new Quaternionf(),
                     new Vector3f(1, 1, 1),
                     new Quaternionf()
             ));
-        });
+        };
+
     }
+
+    /**
+     * Helper method to set basic attributes of a launchable display
+     *
+     * @param display
+     * @return
+     */
+    protected BlockDisplay setDisplayBasics(BlockDisplay display) {
+        display.setBlock(blockData);
+        display.setTeleportDuration(2);
+        display.setInterpolationDuration(5);
+        display.setInvulnerable(true);
+        return display;
+    }
+
 
     /**
      * @return cancelled
@@ -98,7 +140,7 @@ public abstract class AbstractLaunchable<T extends Serializable> {
     private boolean callEvent() {
         SentinelProjectileLaunchEvent event = new SentinelProjectileLaunchEvent(this.display);
         Sentinels.getInstance().getServer().getPluginManager().callEvent(event);
-        if(event.isCancelled()) {
+        if (event.isCancelled()) {
             this.display.remove();
             return true;
         }
@@ -107,6 +149,18 @@ public abstract class AbstractLaunchable<T extends Serializable> {
 
     private void initPhysics() {
         new BasicPhysics(this.display);
+    }
+
+    private void knockback(Player player, double scalar) {
+        Entity vehicle;
+        if (player.isInsideVehicle()) {
+            vehicle = player.getVehicle();
+        } else {
+            vehicle = player;
+        }
+        Vector direction = player.getEyeLocation().getDirection().normalize();
+        Vector opposite = direction.multiply(-1);
+        vehicle.setVelocity(opposite.multiply(scalar));
     }
 
 }
