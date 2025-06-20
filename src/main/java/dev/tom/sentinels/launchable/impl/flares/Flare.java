@@ -8,6 +8,7 @@ import dev.tom.sentinels.launchable.LaunchableListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Allay;
 import org.bukkit.entity.Entity;
@@ -32,7 +33,7 @@ public class Flare extends AbstractLaunchable<FlareAttributes>  {
 
     /**
      * Create allays with goals to repair barriers
-     * @param adjacent location adjacent to the hit block (outside the barrier)
+     * @param direction location adjacent to the hit block (outside the barrier)
      * @param hitBlock the block the flare collided with
      * @param attributes
      * @return
@@ -40,6 +41,7 @@ public class Flare extends AbstractLaunchable<FlareAttributes>  {
     protected static Set<Allay> createAllays(Vector direction, Location hitBlock, FlareAttributes attributes) {
         Set<Allay> allays = new HashSet<>();
 
+        // TODO this should be fixed with better collisions
         double distanceFromBarrier = 5;
         direction = direction.normalize().multiply(distanceFromBarrier);
         Location spawn = hitBlock.clone().add(direction);
@@ -48,6 +50,10 @@ public class Flare extends AbstractLaunchable<FlareAttributes>  {
                 mob.setCanPickupItems(false);
                 mob.setCollidable(true);
                 mob.getEquipment().setItemInMainHand(new ItemStack(Material.GLASS));
+
+                // Mob health
+                mob.getAttribute(Attribute.MAX_HEALTH).setBaseValue(attributes.mobHealth());
+                mob.setHealth(attributes.mobHealth());
             });
             allays.add(allay);
             Bukkit.getMobGoals().addGoal(allay, 0, new AllayRepairGoal(allay, hitBlock, attributes));
