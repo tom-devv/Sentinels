@@ -36,15 +36,21 @@ public abstract class AbstractLaunchable<T extends Serializable> {
     protected final ItemStack item;
     protected final BlockData blockData;
     protected final Class<T> type;
+    public final T attributes;
 
     public AbstractLaunchable(ItemStack item, @NotNull BlockData blockData, @NotNull Class<T> type) {
         this.blockData = blockData;
         this.type = type;
         this.item = item;
+        Optional<T> opt = SentinelDataWrapper.getInstance().loadPDC(item.getItemMeta(), type);
+        if(opt.isPresent()) {
+            this.attributes = opt.get();
+        } else {
+            throw new RuntimeException("Failed to load item PDC on: " + item + " " + type + " " + blockData);
+        }
     }
 
     protected @Nullable BlockDisplay display;
-
 
     /**
      * Launch a display as/from a player
@@ -171,4 +177,7 @@ public abstract class AbstractLaunchable<T extends Serializable> {
         vehicle.setVelocity(opposite.multiply(scalar));
     }
 
+    public T getAttributes() {
+        return attributes;
+    }
 }

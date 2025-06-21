@@ -69,7 +69,7 @@ public class Flare extends AbstractLaunchable<FlareAttributes>  {
         }
 
         @EventHandler
-        public void entityCollide(SentinelProjectileCollideEvent e){
+        public void flareCollide(SentinelProjectileCollideEvent e){
             if(!e.getEntity().isValid()) return;
             Entity entity = e.getEntity();
             Optional<FlareAttributes> optionalAttributes;

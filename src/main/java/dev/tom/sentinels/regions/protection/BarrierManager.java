@@ -3,6 +3,7 @@ package dev.tom.sentinels.regions.protection;
 import dev.tom.sentinels.regions.Manager;
 import dev.tom.sentinels.regions.Region;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +42,10 @@ public class BarrierManager implements Manager<Barrier>  {
         barriers.remove(barrier);
         locationRegionMap.remove(barrier.getLocation());
         locationBarrierMap.remove(barrier.getLocation());
+    }
+
+    public Barrier getBarrier(Block block){
+        return getBarrier(block.getLocation());
     }
 
     public Barrier getBarrier(Location location){

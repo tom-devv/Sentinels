@@ -13,7 +13,9 @@ public record BombAttributes(
         boolean gravity,
         @FieldInfo(name = "speed", unit = "m/s") double velocity,
         double damage,
-        @FieldInfo(unit = "m/s") double knockback
+        @FieldInfo(unit = "m") double radius,
+        @FieldInfo(unit = "m/s") double knockback,
+        @FieldInfo(name = "") int explosions
 ) implements Gravity, Velocity, Knockback, Serializable {
 
 }

@@ -1,5 +1,8 @@
 package dev.tom.sentinels.events;
 
+import dev.tom.sentinels.regions.protection.Barrier;
+import dev.tom.sentinels.regions.protection.BarrierManager;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -19,6 +22,19 @@ public class SentinelProjectileCollideEvent extends EntityEvent {
         super(projectile);
         this.hitBlock = hitBlock;
         this.hitBlockFace = hitBlockFace;
+    }
+
+    private void checkBarrier(){
+        Barrier barrier = BarrierManager.getInstance().getBarrier(this.hitBlock);
+        if(barrier != null) {
+            SentinelProjectileCollideBarrierEvent event = new SentinelProjectileCollideBarrierEvent(
+                    this.entity,
+                    this.hitBlock,
+                    this.hitBlockFace,
+                    barrier
+            );
+            Bukkit.getPluginManager().callEvent(event);
+        }
     }
 
     public BlockFace getHitBlockFace() {

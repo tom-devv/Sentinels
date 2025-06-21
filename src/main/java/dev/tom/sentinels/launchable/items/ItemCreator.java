@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.kyori.adventure.text.Component.text;
-import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
 import static net.kyori.adventure.text.format.TextColor.color;
 
 public class ItemCreator<T extends Serializable & ItemSupplier> {
@@ -34,22 +33,15 @@ public class ItemCreator<T extends Serializable & ItemSupplier> {
             meta.displayName(supplier.nameComponent());
             meta.lore(getLore());
         });
-        final Component component = text()
-                .content("Hello").color(color(0x13f832))
-                .append(text(" world!", GREEN))
-                .build();
-
         SentinelDataWrapper.getInstance().savePDC(itemStack, supplier);
         return itemStack;
     }
-
 
     private List<Component> getLore() {
         List<Component> lore = new ArrayList<>(supplier.prefixLoreComponent());
         lore.addAll(parsedComponents());
         return lore;
     }
-
 
     private List<Component> parsedComponents(){
         List<Component> lore = new ArrayList<>();
@@ -64,14 +56,14 @@ public class ItemCreator<T extends Serializable & ItemSupplier> {
                 System.err.println("Error accessing ItemSupplier: " + supplier.getClass().getName() + " field: " + name);
                 lore.add(
                         text()
-                                .content("Failed to resolve lore")
-                                .color(NamedTextColor.RED)
-                                .decoration(TextDecoration.BOLD, true)
-                                .build()
+                            .content("Failed to resolve lore")
+                            .color(NamedTextColor.RED)
+                            .decoration(TextDecoration.BOLD, true)
+                            .build()
                 );
                 continue;
             }
-            Component loreComponent = parseValue(recordComponent, value);
+            Component loreComponent = parseComponent(recordComponent, value);
             if(loreComponent != null) {
                 lore.add(loreComponent);
             }
@@ -80,7 +72,7 @@ public class ItemCreator<T extends Serializable & ItemSupplier> {
     }
 
 
-    private Component parseValue(RecordComponent component, Object value){
+    private Component parseComponent(RecordComponent component, Object value){
         FieldInfo info = component.getAnnotation(FieldInfo.class);
         if(info != null && info.ignore()) {
             return null;
@@ -91,7 +83,7 @@ public class ItemCreator<T extends Serializable & ItemSupplier> {
                 .content(fieldName).color(color(0x3768db))
                 .append(text(": ").color(NamedTextColor.GRAY));
         if (value instanceof Boolean boolValue) {
-            builder.append(text(boolValue ? "Yes" : "No").color(boolValue ? GREEN : NamedTextColor.RED));
+            builder.append(text(boolValue ? "Yes" : "No"));
         } else if (value == null) {
             builder.append(text("N/A").color(NamedTextColor.DARK_GRAY));
         } else {
