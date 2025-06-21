@@ -1,5 +1,6 @@
 package dev.tom.sentinels.launchable.impl.shells;
 
+import dev.tom.sentinels.Sentinels;
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.events.SentinelProjectileCollideBarrierEvent;
 import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
@@ -27,7 +28,26 @@ public class Shell extends AbstractLaunchable<ShellAttributes>  {
         super(item, Material.TNT.createBlockData(), ShellAttributes.class);
     }
 
-    private static class ShellListeners implements LaunchableListener {
+    private void collision(SentinelProjectileCollideEvent e) {
+        Block block = e.getHitBlock();
+        // Spawn explosion to handle blocklist radius etc
+        World world = block.getWorld();
+        world.spawn(block.getLocation(), TNTPrimed.class, tnt -> {
+            SentinelDataWrapper.getInstance().savePDC(tnt, attributes);
+            tnt.setYield((float) attributes.radius());
+            tnt.setFuseTicks(0); // Explode quickly
+            tnt.setGravity(false); // Don't move down at all
+        });
+    }
+
+
+    private static class ShellListeners implements LaunchableListener<Shell> {
+        /**
+         * This is TNT exploding not a launchable
+         * TNT is used here to get a blocklist rather
+         * than search for blocks in a radius
+         * @param e
+         */
         @EventHandler
         public void projectileExplosion(EntityExplodeEvent e){
             if(!(e.getEntity() instanceof TNTPrimed tnt)) return;
@@ -48,17 +68,9 @@ public class Shell extends AbstractLaunchable<ShellAttributes>  {
         public void projectileHit(SentinelProjectileCollideEvent e){
             if(!e.getEntity().isValid()) return;
             Entity entity = e.getEntity();
-            Optional<ShellAttributes> optionalData;
-            if ((optionalData = SentinelDataWrapper.getInstance().loadPDC(entity, ShellAttributes.class)).isEmpty()) return;
-            ShellAttributes attributes = optionalData.get();
-            Block block = e.getHitBlock();
-            // Spawn explosion to handle blocklist radius etc
-            World world = block.getWorld();
-            world.spawn(block.getLocation(), TNTPrimed.class, tnt -> {
-                SentinelDataWrapper.getInstance().savePDC(tnt, attributes);
-                tnt.setYield((float) attributes.radius());
-                tnt.setFuseTicks(0); // Explode quickly
-                tnt.setGravity(false); // Don't move down at all
+            getLaunchable(entity).ifPresent(shell -> {
+                shell.collision(e);
+                shell.remove();
             });
             entity.remove();
         }

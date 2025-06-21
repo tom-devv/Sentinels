@@ -64,7 +64,6 @@ public class Bomb extends AbstractLaunchable<BombAttributes> {
             }, i);
 
         }
-        remove();
     }
 
     private static void spawnParticle(Entity entity, Particle particle, int count) {
@@ -91,19 +90,20 @@ public class Bomb extends AbstractLaunchable<BombAttributes> {
         };
     }
 
-    private static class BombListeners implements LaunchableListener {
+    private static class BombListeners implements LaunchableListener<Bomb> {
 
         @EventHandler
         public void bombCollide(SentinelProjectileCollideEvent e) {
             Entity entity = e.getEntity();
-            AbstractLaunchable<?> launchable = AbstractLaunchable.launchables.get(entity);
-            if (!(launchable instanceof Bomb bomb)) return;
-            bomb.explode(); // instance method, no static!
+            getLaunchable(entity).ifPresent(bomb -> {
+                bomb.explode();
+                bomb.remove();
+            });
         }
 
 
         @EventHandler
-        public void playerFireFlare(PlayerInteractEvent e){
+        public void playerFireBomb(PlayerInteractEvent e){
             handleLaunch(e, Bomb.class, BombAttributes.class);
         }
     }

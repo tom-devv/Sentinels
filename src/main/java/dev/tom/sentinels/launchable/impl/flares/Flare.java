@@ -35,10 +35,9 @@ public class Flare extends AbstractLaunchable<FlareAttributes>  {
      * Create allays with goals to repair barriers
      * @param direction location adjacent to the hit block (outside the barrier)
      * @param hitBlock the block the flare collided with
-     * @param attributes
      * @return
      */
-    protected static Set<Allay> createAllays(Vector direction, Location hitBlock, FlareAttributes attributes) {
+    protected Set<Allay> createAllays(Vector direction, Location hitBlock) {
         Set<Allay> allays = new HashSet<>();
 
         // TODO this should be fixed with better collisions
@@ -61,7 +60,7 @@ public class Flare extends AbstractLaunchable<FlareAttributes>  {
         return allays;
     }
 
-    private static class FlareListener implements LaunchableListener {
+    private static class FlareListener implements LaunchableListener<Flare> {
 
         @EventHandler
         public void playerFireFlare(PlayerInteractEvent e){
@@ -72,12 +71,11 @@ public class Flare extends AbstractLaunchable<FlareAttributes>  {
         public void flareCollide(SentinelProjectileCollideEvent e){
             if(!e.getEntity().isValid()) return;
             Entity entity = e.getEntity();
-            Optional<FlareAttributes> optionalAttributes;
-            if((optionalAttributes = SentinelDataWrapper.getInstance().loadPDC(entity, FlareAttributes.class)).isEmpty()) return;
-            FlareAttributes attributes = optionalAttributes.get();
-            Block block = e.getHitBlock();
-            Flare.createAllays(e.getHitBlockFace().getDirection(), block.getLocation(), attributes);
-            e.getEntity().remove();
+            getLaunchable(entity).ifPresent(flare -> {
+                flare.createAllays(e.getHitBlockFace().getDirection(), e.getHitBlock().getLocation());
+                flare.remove();
+            });
+
         }
     }
 }

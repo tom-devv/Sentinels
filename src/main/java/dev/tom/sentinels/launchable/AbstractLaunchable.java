@@ -195,4 +195,5 @@ public abstract class AbstractLaunchable<T extends Serializable> {
     public T getAttributes() {
         return attributes;
     }
+
 }
