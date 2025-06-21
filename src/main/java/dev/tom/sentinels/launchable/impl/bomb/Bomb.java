@@ -1,5 +1,6 @@
 package dev.tom.sentinels.launchable.impl.bomb;
 
+import dev.tom.sentinels.Sentinels;
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.events.SentinelProjectileCollideBarrierEvent;
 import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
@@ -14,6 +15,7 @@ import dev.tom.sentinels.regions.protection.BarrierManager;
 import dev.tom.sentinels.regions.protection.Healable;
 import dev.tom.sentinels.utils.BlockUtil;
 import dev.tom.sentinels.utils.RegionUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -46,18 +48,23 @@ public class Bomb extends AbstractLaunchable<BombAttributes> {
 
     /**
      * Find nearby healable regions and damage them entirely
-     * @param entity
-     * @param attributes
      */
-    public static void explode(Entity entity, BombAttributes attributes) {
-        spawnParticle(entity, Particle.EXPLOSION, 3);
-        spawnParticle(entity, Particle.FIREWORK, 5);
+    public void explode() {
         Set<Healable> healableRegions = RegionUtil.getHealableRegions(
-                BlockUtil.getBlocksInRadius(entity.getLocation(), attributes.radius())
+                BlockUtil.getBlocksInRadius(this.display.getLocation(), attributes.radius())
         );
-        for (Healable healable : healableRegions) {
-            healable.damage(attributes.damage());
+
+        for (int i = 0; i < attributes.explosions(); i++) {
+            Bukkit.getScheduler().runTaskLater(Sentinels.getInstance(), () -> {
+                spawnParticle(this.display, Particle.EXPLOSION, 3);
+                spawnParticle(this.display, Particle.FIREWORK, 5);
+                for (Healable healable : healableRegions) {
+                    healable.damage(attributes.damage());
+                }
+            }, i);
+
         }
+        remove();
     }
 
     private static void spawnParticle(Entity entity, Particle particle, int count) {
@@ -89,13 +96,9 @@ public class Bomb extends AbstractLaunchable<BombAttributes> {
         @EventHandler
         public void bombCollide(SentinelProjectileCollideEvent e) {
             Entity entity = e.getEntity();
-            Optional<BombAttributes> optionalAttributes;
-            if((optionalAttributes = SentinelDataWrapper.getInstance().loadPDC(entity, BombAttributes.class)).isEmpty()) return;
-            BombAttributes attributes = optionalAttributes.get();
-            for (int i = 0; i < attributes.explosions(); i++) {
-                Bomb.explode(entity, attributes);
-            }
-            entity.remove();
+            AbstractLaunchable<?> launchable = AbstractLaunchable.launchables.get(entity);
+            if (!(launchable instanceof Bomb bomb)) return;
+            bomb.explode(); // instance method, no static!
         }
 
 

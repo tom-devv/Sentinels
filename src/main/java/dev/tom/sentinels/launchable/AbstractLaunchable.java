@@ -1,5 +1,6 @@
 package dev.tom.sentinels.launchable;
 
+import ca.spottedleaf.moonrise.common.util.EntityUtil;
 import dev.tom.sentinels.Sentinels;
 import dev.tom.sentinels.data.PDCTransferResult;
 import dev.tom.sentinels.data.SentinelDataWrapper;
@@ -26,12 +27,16 @@ import org.joml.Vector3f;
 import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import static net.kyori.adventure.text.Component.text;
 
 public abstract class AbstractLaunchable<T extends Serializable> {
+
+    public static final Map<Entity, AbstractLaunchable<?>> launchables = new HashMap<>();
 
     protected final ItemStack item;
     protected final BlockData blockData;
@@ -50,7 +55,7 @@ public abstract class AbstractLaunchable<T extends Serializable> {
         }
     }
 
-    protected @Nullable BlockDisplay display;
+    protected BlockDisplay display;
 
     /**
      * Launch a display as/from a player
@@ -69,6 +74,7 @@ public abstract class AbstractLaunchable<T extends Serializable> {
         // because attributes may change entity attributes
         Optional<PDCTransferResult<T, BlockDisplay>> result = handleAttributes(player);
         initPhysics();
+        launchables.put(this.display, this);
         return result;
     }
 
@@ -176,6 +182,15 @@ public abstract class AbstractLaunchable<T extends Serializable> {
         Vector opposite = direction.multiply(-1);
         vehicle.setVelocity(opposite.multiply(scalar));
     }
+
+    /**
+     * Remove display entity and key from map
+     */
+    public void remove() {
+        launchables.remove(this.display);
+        this.display.remove();
+    }
+
 
     public T getAttributes() {
         return attributes;
