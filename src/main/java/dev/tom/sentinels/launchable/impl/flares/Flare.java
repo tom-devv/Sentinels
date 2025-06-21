@@ -65,17 +65,7 @@ public class Flare extends AbstractLaunchable<FlareAttributes>  {
 
         @EventHandler
         public void playerFireFlare(PlayerInteractEvent e){
-            // Only fire when interacting with air
-            if(e.getAction() != Action.RIGHT_CLICK_AIR) return;
-            if(e.getItem() == null) return;
-            Player player = e.getPlayer();
-            ItemStack item = e.getItem();
-            if(!SentinelDataWrapper.getInstance().isType(item.getItemMeta(), FlareAttributes.class)) {
-                return;
-            }
-            // Not a flare, can't fire
-            Flare flare = new Flare(item);
-            flare.launch(player.getEyeLocation(), player);
+            handleLaunch(e, Flare.class, FlareAttributes.class);
         }
 
         @EventHandler

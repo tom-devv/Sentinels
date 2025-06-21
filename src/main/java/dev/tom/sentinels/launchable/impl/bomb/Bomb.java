@@ -20,49 +20,40 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.util.function.Consumer;
+
 public class Bomb extends AbstractLaunchable<BombAttributes> {
 
     public Bomb(ItemStack item) {
         super(item, Material.SHULKER_SHELL.createBlockData(), BombAttributes.class);
     }
 
-    /**
-     * Override to increase scale as bomb is big
-     */
+
     @Override
-    protected @NotNull BlockDisplay createDisplay(Location location) {
+    protected Consumer<? super BlockDisplay> displaySettings(Location location) {
         Vector direction = location.getDirection();
-        BlockDisplay display = location.getWorld().spawn(location, BlockDisplay.class, entity -> {
-            entity.setRotation(location.getYaw(), location.getPitch());
-            entity.setVelocity(direction.normalize());
-            entity.setTransformation(new Transformation(
+        return display -> {
+            display.setRotation(location.getYaw(), location.getPitch());
+            display.setVelocity(direction.normalize());
+            display.setTransformation(new Transformation(
                     new Vector3f(-0.5f, -0.5f, -1f),
                     new Quaternionf(),
                     new Vector3f(3, 3, 3),
                     new Quaternionf()
             ));
-        });
-        setDisplayBasics(display);
-        return display;
+            display.setBlock(blockData);
+            display.setTeleportDuration(2);
+            display.setInterpolationDuration(5);
+            display.setInvulnerable(true);
+        };
     }
 
-
-    private class BombListeners implements LaunchableListener {
+    private static class BombListeners implements LaunchableListener {
 
 
         @EventHandler
         public void playerFireFlare(PlayerInteractEvent e){
-            // Only fire when interacting with air
-            if(e.getAction() != Action.RIGHT_CLICK_AIR) return;
-            if(e.getItem() == null) return;
-            Player player = e.getPlayer();
-            ItemStack item = e.getItem();
-            if(!SentinelDataWrapper.getInstance().isType(item.getItemMeta(), BombAttributes.class)) {
-                return;
-            }
-            // Not a flare, can't fire
-            Bomb bomb = new Bomb(item);
-            bomb.launch(player.getEyeLocation(), player);
+            handleLaunch(e, Bomb.class, BombAttributes.class);
         }
     }
 }

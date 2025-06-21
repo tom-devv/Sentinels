@@ -14,6 +14,8 @@ import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
@@ -23,6 +25,7 @@ import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -51,7 +54,7 @@ public abstract class AbstractLaunchable<T extends Serializable> {
      * @return optional transfer result
      */
     public final Optional<PDCTransferResult<T, BlockDisplay>> launch(Location location, @Nullable Player player) {
-        this.display = createDisplay(location);
+        this.display = createDisplay(location, displaySettings(location));
         if (callEvent()) { // cancelled
             return Optional.empty();
         }
@@ -97,14 +100,29 @@ public abstract class AbstractLaunchable<T extends Serializable> {
         }
     }
 
-    protected @NotNull BlockDisplay createDisplay(Location location, final @Nullable Consumer<? super BlockDisplay> function) {
-        Vector direction = location.getDirection();
-        BlockDisplay display = location.getWorld().spawn(location, BlockDisplay.class, function);
-        setDisplayBasics(display);
-        return display;
+     protected static <T extends AbstractLaunchable<?>> void handleLaunch(PlayerInteractEvent e, Class<T> launchableClass, Class<? extends Serializable> attributesClass) {
+        if (e.getAction() != Action.RIGHT_CLICK_AIR) return;
+        if (e.getItem() == null) return;
+
+        ItemStack item = e.getItem();
+        Player player = e.getPlayer();
+
+        if (!SentinelDataWrapper.getInstance().isType(item.getItemMeta(), attributesClass)) return;
+
+        try {
+            Constructor<T> constructor = launchableClass.getConstructor(ItemStack.class);
+            T launchable = constructor.newInstance(item);
+            launchable.launch(player.getEyeLocation(), player);
+        } catch (ReflectiveOperationException ex) {
+            ex.printStackTrace(); // or handle gracefully
+        }
     }
 
-    protected Consumer<? super BlockDisplay> defaultDisplaySettings(Location location) {
+    protected @NotNull BlockDisplay createDisplay(Location location, final @Nullable Consumer<? super BlockDisplay> function) {
+        return location.getWorld().spawn(location, BlockDisplay.class, function);
+    }
+
+    protected Consumer<? super BlockDisplay> displaySettings(Location location) {
         Vector direction = location.getDirection();
         return display -> {
             display.setRotation(location.getYaw(), location.getPitch());
@@ -115,22 +133,12 @@ public abstract class AbstractLaunchable<T extends Serializable> {
                     new Vector3f(1, 1, 1),
                     new Quaternionf()
             ));
+            display.setBlock(blockData);
+            display.setTeleportDuration(2);
+            display.setInterpolationDuration(5);
+            display.setInvulnerable(true);
         };
 
-    }
-
-    /**
-     * Helper method to set basic attributes of a launchable display
-     *
-     * @param display
-     * @return
-     */
-    protected BlockDisplay setDisplayBasics(BlockDisplay display) {
-        display.setBlock(blockData);
-        display.setTeleportDuration(2);
-        display.setInterpolationDuration(5);
-        display.setInvulnerable(true);
-        return display;
     }
 
 

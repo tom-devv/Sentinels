@@ -85,17 +85,7 @@ public class Shell extends AbstractLaunchable<ShellAttributes>  {
 
         @EventHandler
         public void playerFireShell(PlayerInteractEvent e){
-            // Only fire when interacting with air
-            if(e.getAction() != Action.RIGHT_CLICK_AIR) return;
-            if(e.getItem() == null) return;
-            Player player = e.getPlayer();
-            ItemStack item = e.getItem();
-            if(!SentinelDataWrapper.getInstance().isType(item.getItemMeta(), ShellAttributes.class)) {
-                return;
-            }
-            // Not a flare, can't fire
-            Shell shell = new Shell(item);
-            shell.launch(player.getEyeLocation(), player);
+            handleLaunch(e, Shell.class, ShellAttributes.class);
         }
 
     }
