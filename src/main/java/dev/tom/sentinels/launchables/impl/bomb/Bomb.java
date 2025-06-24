@@ -1,47 +1,30 @@
-package dev.tom.sentinels.launchable.impl.bomb;
+package dev.tom.sentinels.launchables.impl.bomb;
 
 import dev.tom.sentinels.Sentinels;
-import dev.tom.sentinels.data.SentinelDataWrapper;
-import dev.tom.sentinels.events.SentinelProjectileCollideBarrierEvent;
 import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
-import dev.tom.sentinels.launchable.AbstractLaunchable;
-import dev.tom.sentinels.launchable.LaunchableListener;
-import dev.tom.sentinels.launchable.impl.flares.Flare;
-import dev.tom.sentinels.launchable.impl.flares.FlareAttributes;
-import dev.tom.sentinels.regions.Region;
-import dev.tom.sentinels.regions.impl.ProtectedCuboidRegion;
-import dev.tom.sentinels.regions.protection.Barrier;
-import dev.tom.sentinels.regions.protection.BarrierManager;
+import dev.tom.sentinels.launchables.Launchable;
+import dev.tom.sentinels.items.ItemListener;
 import dev.tom.sentinels.regions.protection.Healable;
 import dev.tom.sentinels.utils.BlockUtil;
 import dev.tom.sentinels.utils.RegionUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class Bomb extends AbstractLaunchable<BombAttributes> {
+public class Bomb extends Launchable<BombAttributes> {
 
     public Bomb(ItemStack item) {
         super(item, Material.MAGMA_BLOCK.createBlockData(), BombAttributes.class);
@@ -94,7 +77,7 @@ public class Bomb extends AbstractLaunchable<BombAttributes> {
         };
     }
 
-    private static class BombListeners implements LaunchableListener<Bomb> {
+    private static class BombListeners implements ItemListener<Bomb> {
 
         @EventHandler
         public void bombCollide(SentinelProjectileCollideEvent e) {

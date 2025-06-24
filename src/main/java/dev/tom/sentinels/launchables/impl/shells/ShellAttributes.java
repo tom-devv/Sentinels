@@ -1,9 +1,9 @@
-package dev.tom.sentinels.launchable.impl.shells;
+package dev.tom.sentinels.launchables.impl.shells;
 
-import dev.tom.sentinels.launchable.attributes.Gravity;
-import dev.tom.sentinels.launchable.ItemSupplier;
-import dev.tom.sentinels.launchable.attributes.Knockback;
-import dev.tom.sentinels.launchable.attributes.Velocity;
+import dev.tom.sentinels.launchables.attributes.Gravity;
+import dev.tom.sentinels.items.ItemSupplier;
+import dev.tom.sentinels.launchables.attributes.Knockback;
+import dev.tom.sentinels.launchables.attributes.Velocity;
 import dev.tom.sentinels.items.FieldInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;

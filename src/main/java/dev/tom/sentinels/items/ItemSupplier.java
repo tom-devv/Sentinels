@@ -1,4 +1,4 @@
-package dev.tom.sentinels.launchable;
+package dev.tom.sentinels.items;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;

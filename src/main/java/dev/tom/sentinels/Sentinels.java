@@ -1,10 +1,8 @@
 package dev.tom.sentinels;
 
+import dev.tom.sentinels.commands.ItemCommand;
 import dev.tom.sentinels.commands.ProjectileCommand;
-import dev.tom.sentinels.launchable.ListenerRegister;
-import dev.tom.sentinels.launchable.impl.flares.Flare;
-import dev.tom.sentinels.launchable.impl.shells.Shell;
-import dev.tom.sentinels.launchable.impl.shells.ShellAttributes;
+import dev.tom.sentinels.items.ItemListenerRegister;
 import dev.tom.sentinels.placeable.Rally;
 import dev.tom.sentinels.regions.impl.ProtectedCuboidRegion;
 import dev.tom.sentinels.regions.protection.Barrier;
@@ -12,13 +10,11 @@ import dev.tom.sentinels.regions.protection.BarrierManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Sentinels extends JavaPlugin implements Listener {
@@ -31,6 +27,7 @@ public class Sentinels extends JavaPlugin implements Listener {
         instance = this;
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(ProjectileCommand.command());
+            commands.registrar().register(ItemCommand.command());
         });
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new Rally(), this);
@@ -39,7 +36,7 @@ public class Sentinels extends JavaPlugin implements Listener {
             spawnCube();
         }, 20 * 3);
 
-        ListenerRegister.register(this);
+        ItemListenerRegister.register(this);
     }
 
     public void spawnCube() {
@@ -61,7 +58,6 @@ public class Sentinels extends JavaPlugin implements Listener {
         if(block == null) return;
         Barrier barrier = BarrierManager.getInstance().getBarrier(block.getLocation());
         if(barrier == null) {
-            System.out.println("Null barrier");
             return;
         }
         e.getPlayer().sendMessage("Barrier health: " + barrier.getHealth());

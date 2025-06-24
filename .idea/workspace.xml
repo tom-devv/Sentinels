@@ -4,8 +4,35 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f2878284-92c9-4365-9b29-03e3e02e15eb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+    <list default="true" id="f2878284-92c9-4365-9b29-03e3e02e15eb" name="Changes" comment="update ignore">
+      <change afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/commands/ItemCommand.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/items/Item.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/items/rally/Flag.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/items/rally/FlagAttributes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/Sentinels.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/Sentinels.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/ai/AllayRepairGoal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/ai/AllayRepairGoal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/ai/GhastRallyGoal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/ai/GhastRallyGoal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/commands/ProjectileCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/commands/ProjectileCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/items/ItemCreator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/items/ItemCreator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/items/SentinelItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/AbstractLaunchable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/Launchable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/ItemSupplier.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/items/ItemSupplier.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/LaunchableListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/items/ItemListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/ListenerRegister.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/items/ItemListenerRegister.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/attributes/Gravity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/attributes/Gravity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/attributes/Knockback.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/attributes/Knockback.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/attributes/Velocity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/attributes/Velocity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/impl/bomb/Bomb.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/impl/bomb/Bomb.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/impl/bomb/BombAttributes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/impl/bomb/BombAttributes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/impl/flares/Flare.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/impl/flares/Flare.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/impl/flares/FlareAttributes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/impl/flares/FlareAttributes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/impl/shells/Shell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/impl/shells/Shell.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/impl/shells/ShellAttributes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/impl/shells/ShellAttributes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/physics/BasicPhysics.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/physics/BasicPhysics.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchable/physics/CollisionDetector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/launchables/physics/CollisionDetector.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/placeable/RallyAttributes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dev/tom/sentinels/placeable/RallyAttributes.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,6 +79,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="package-info" />
+        <option value="Interface" />
         <option value="Record" />
         <option value="Class" />
       </list>
@@ -72,8 +100,10 @@
   &quot;keyToString&quot;: {
     &quot;Gradle.Download Sources.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.sentinels [build].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;//wsl.localhost/Ubuntu-22.04/home/kynes/sentinels&quot;,
@@ -147,10 +177,25 @@
       <workItem from="1750773083849" duration="138000" />
       <workItem from="1750773232586" duration="391000" />
       <workItem from="1750773795068" duration="2759000" />
+      <workItem from="1750776595075" duration="166000" />
+      <workItem from="1750792981439" duration="3034000" />
     </task>
+    <task id="LOCAL-00001" summary="update ignore">
+      <option name="closed" value="true" />
+      <created>1750776730555</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1750776730555</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="update ignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="update ignore" />
   </component>
 </project>

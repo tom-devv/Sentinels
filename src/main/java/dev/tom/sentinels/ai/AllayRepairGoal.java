@@ -4,7 +4,7 @@ import com.destroystokyo.paper.entity.ai.Goal;
 import com.destroystokyo.paper.entity.ai.GoalKey;
 import com.destroystokyo.paper.entity.ai.GoalType;
 import dev.tom.sentinels.Sentinels;
-import dev.tom.sentinels.launchable.impl.flares.FlareAttributes;
+import dev.tom.sentinels.launchables.impl.flares.FlareAttributes;
 import dev.tom.sentinels.regions.protection.Barrier;
 import dev.tom.sentinels.regions.protection.BarrierManager;
 import dev.tom.sentinels.utils.BlockUtil;

@@ -1,7 +1,6 @@
 package dev.tom.sentinels.items;
 
 import dev.tom.sentinels.data.SentinelDataWrapper;
-import dev.tom.sentinels.launchable.ItemSupplier;
 import dev.tom.sentinels.utils.TextUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;

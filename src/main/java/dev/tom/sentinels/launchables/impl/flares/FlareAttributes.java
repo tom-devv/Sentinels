@@ -1,8 +1,8 @@
-package dev.tom.sentinels.launchable.impl.flares;
+package dev.tom.sentinels.launchables.impl.flares;
 
-import dev.tom.sentinels.launchable.attributes.Gravity;
-import dev.tom.sentinels.launchable.ItemSupplier;
-import dev.tom.sentinels.launchable.attributes.Velocity;
+import dev.tom.sentinels.launchables.attributes.Gravity;
+import dev.tom.sentinels.items.ItemSupplier;
+import dev.tom.sentinels.launchables.attributes.Velocity;
 import dev.tom.sentinels.items.FieldInfo;
 import dev.tom.sentinels.utils.TextUtil;
 import net.kyori.adventure.text.Component;

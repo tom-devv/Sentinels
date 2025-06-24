@@ -1,31 +1,25 @@
-package dev.tom.sentinels.launchable.impl.flares;
+package dev.tom.sentinels.launchables.impl.flares;
 
 import dev.tom.sentinels.ai.AllayRepairGoal;
-import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
-import dev.tom.sentinels.launchable.AbstractLaunchable;
-import dev.tom.sentinels.launchable.LaunchableListener;
+import dev.tom.sentinels.launchables.Launchable;
+import dev.tom.sentinels.items.ItemListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Allay;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 
 
-public class Flare extends AbstractLaunchable<FlareAttributes>  {
+public class Flare extends Launchable<FlareAttributes> {
 
     public Flare(ItemStack item) {
         super(item, Material.REDSTONE_BLOCK.createBlockData(), FlareAttributes.class);
@@ -60,7 +54,7 @@ public class Flare extends AbstractLaunchable<FlareAttributes>  {
         return allays;
     }
 
-    private static class FlareListener implements LaunchableListener<Flare> {
+    private static class FlareListener implements ItemListener<Flare> {
 
         @EventHandler
         public void playerFireFlare(PlayerInteractEvent e){

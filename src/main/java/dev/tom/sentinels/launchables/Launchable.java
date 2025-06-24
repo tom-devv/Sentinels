@@ -1,19 +1,18 @@
-package dev.tom.sentinels.launchable;
+package dev.tom.sentinels.launchables;
 
-import ca.spottedleaf.moonrise.common.util.EntityUtil;
 import dev.tom.sentinels.Sentinels;
 import dev.tom.sentinels.data.PDCTransferResult;
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.events.SentinelProjectileLaunchEvent;
-import dev.tom.sentinels.launchable.attributes.Gravity;
-import dev.tom.sentinels.launchable.attributes.Knockback;
-import dev.tom.sentinels.launchable.attributes.Velocity;
-import dev.tom.sentinels.launchable.physics.BasicPhysics;
+import dev.tom.sentinels.items.Item;
+import dev.tom.sentinels.launchables.attributes.Gravity;
+import dev.tom.sentinels.launchables.attributes.Knockback;
+import dev.tom.sentinels.launchables.attributes.Velocity;
+import dev.tom.sentinels.launchables.physics.BasicPhysics;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -34,25 +33,15 @@ import java.util.function.Consumer;
 
 import static net.kyori.adventure.text.Component.text;
 
-public abstract class AbstractLaunchable<T extends Serializable> {
+public abstract class Launchable<T extends Serializable> extends Item<T> {
 
-    public static final Map<Entity, AbstractLaunchable<?>> launchables = new HashMap<>();
+    public static final Map<Entity, Launchable<?>> launchables = new HashMap<>();
 
-    protected final ItemStack item;
     protected final BlockData blockData;
-    protected final Class<T> type;
-    public final T attributes;
 
-    public AbstractLaunchable(ItemStack item, @NotNull BlockData blockData, @NotNull Class<T> type) {
+    public Launchable(ItemStack item, @NotNull BlockData blockData, @NotNull Class<T> type) {
+        super(item, type);
         this.blockData = blockData;
-        this.type = type;
-        this.item = item;
-        Optional<T> opt = SentinelDataWrapper.getInstance().loadPDC(item.getItemMeta(), type);
-        if(opt.isPresent()) {
-            this.attributes = opt.get();
-        } else {
-            throw new RuntimeException("Failed to load item PDC on: " + item + " " + type + " " + blockData);
-        }
     }
 
     protected BlockDisplay display;
@@ -112,7 +101,7 @@ public abstract class AbstractLaunchable<T extends Serializable> {
         }
     }
 
-     protected static <T extends AbstractLaunchable<?>> void handleLaunch(PlayerInteractEvent e, Class<T> launchableClass, Class<? extends Serializable> attributesClass) {
+     protected static <T extends Launchable<?>> void handleLaunch(PlayerInteractEvent e, Class<T> launchableClass, Class<? extends Serializable> attributesClass) {
         if (e.getAction() != Action.RIGHT_CLICK_AIR) return;
         if (e.getItem() == null) return;
 
@@ -190,10 +179,4 @@ public abstract class AbstractLaunchable<T extends Serializable> {
         launchables.remove(this.display);
         this.display.remove();
     }
-
-
-    public T getAttributes() {
-        return attributes;
-    }
-
 }

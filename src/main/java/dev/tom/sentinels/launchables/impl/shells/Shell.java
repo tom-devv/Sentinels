@@ -1,11 +1,9 @@
-package dev.tom.sentinels.launchable.impl.shells;
+package dev.tom.sentinels.launchables.impl.shells;
 
-import dev.tom.sentinels.Sentinels;
 import dev.tom.sentinels.data.SentinelDataWrapper;
-import dev.tom.sentinels.events.SentinelProjectileCollideBarrierEvent;
 import dev.tom.sentinels.events.SentinelProjectileCollideEvent;
-import dev.tom.sentinels.launchable.AbstractLaunchable;
-import dev.tom.sentinels.launchable.LaunchableListener;
+import dev.tom.sentinels.launchables.Launchable;
+import dev.tom.sentinels.items.ItemListener;
 import dev.tom.sentinels.regions.protection.Barrier;
 import dev.tom.sentinels.regions.protection.BarrierManager;
 import org.bukkit.Material;
@@ -21,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class Shell extends AbstractLaunchable<ShellAttributes>  {
+public class Shell extends Launchable<ShellAttributes> {
 
 
     public Shell(ItemStack item) {
@@ -41,7 +39,7 @@ public class Shell extends AbstractLaunchable<ShellAttributes>  {
     }
 
 
-    private static class ShellListeners implements LaunchableListener<Shell> {
+    private static class ShellListeners implements ItemListener<Shell> {
         /**
          * This is TNT exploding not a launchable
          * TNT is used here to get a blocklist rather

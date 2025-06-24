@@ -1,4 +1,4 @@
-package dev.tom.sentinels.launchable.attributes;
+package dev.tom.sentinels.launchables.attributes;
 
 
 public interface Velocity {
