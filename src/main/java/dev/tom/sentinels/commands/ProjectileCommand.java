@@ -8,8 +8,9 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.tom.sentinels.launchable.impl.bomb.BombAttributes;
 import dev.tom.sentinels.launchable.impl.flares.FlareAttributes;
-import dev.tom.sentinels.launchable.items.ItemCreator;
+import dev.tom.sentinels.items.ItemCreator;
 import dev.tom.sentinels.launchable.impl.shells.ShellAttributes;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -42,6 +43,27 @@ public class ProjectileCommand {
                                 return Command.SINGLE_SUCCESS;
                             })
                 ))))))
+                .then(Commands.literal("bomb")
+                        .then(Commands.argument("damage", DoubleArgumentType.doubleArg(0.1))
+                        .then(Commands.argument("radius", DoubleArgumentType.doubleArg(0.1))
+                        .then(Commands.argument("gravity", BoolArgumentType.bool())
+                        .then(Commands.argument("speed", DoubleArgumentType.doubleArg(0.1))
+                        .then(Commands.argument("knockback", DoubleArgumentType.doubleArg(0))
+                        .then(Commands.argument("explosions", IntegerArgumentType.integer(1))
+                            .executes(ctx -> {
+                                if(!(ctx.getSource().getSender() instanceof Player player)) return 0;
+                                double damage = DoubleArgumentType.getDouble(ctx, "damage");
+                                boolean gravity = BoolArgumentType.getBool(ctx, "gravity");
+                                double radius = DoubleArgumentType.getDouble(ctx, "radius");
+                                double speed = DoubleArgumentType.getDouble(ctx, "speed");
+                                double knockback = DoubleArgumentType.getDouble(ctx, "knockback");
+                                int explosions = IntegerArgumentType.getInteger(ctx, "explosions");
+                                BombAttributes attr = new BombAttributes(player.getUniqueId(),  gravity, speed, damage, radius, knockback, explosions);
+                                ItemStack arrowItem = new ItemCreator<>(attr).create();
+                                player.getInventory().addItem(arrowItem);
+                                return Command.SINGLE_SUCCESS;
+                            })
+                    )))))))
                 .then(Commands.literal("flare")
                         .then(Commands.argument("count", IntegerArgumentType.integer(1))
                         .then(Commands.argument("health", DoubleArgumentType.doubleArg(0.1))

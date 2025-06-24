@@ -5,6 +5,7 @@ import dev.tom.sentinels.launchable.ListenerRegister;
 import dev.tom.sentinels.launchable.impl.flares.Flare;
 import dev.tom.sentinels.launchable.impl.shells.Shell;
 import dev.tom.sentinels.launchable.impl.shells.ShellAttributes;
+import dev.tom.sentinels.placeable.Rally;
 import dev.tom.sentinels.regions.impl.ProtectedCuboidRegion;
 import dev.tom.sentinels.regions.protection.Barrier;
 import dev.tom.sentinels.regions.protection.BarrierManager;
@@ -32,6 +33,7 @@ public class Sentinels extends JavaPlugin implements Listener {
             commands.registrar().register(ProjectileCommand.command());
         });
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new Rally(), this);
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
             spawnCube();

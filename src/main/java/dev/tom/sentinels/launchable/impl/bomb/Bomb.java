@@ -28,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -43,8 +44,10 @@ import java.util.function.Consumer;
 public class Bomb extends AbstractLaunchable<BombAttributes> {
 
     public Bomb(ItemStack item) {
-        super(item, Material.SHULKER_SHELL.createBlockData(), BombAttributes.class);
+        super(item, Material.MAGMA_BLOCK.createBlockData(), BombAttributes.class);
     }
+
+    private static final long TIME_BETWEEN_EXPLOSIONS = (long) (1.5*20);
 
     /**
      * Find nearby healable regions and damage them entirely
@@ -53,23 +56,24 @@ public class Bomb extends AbstractLaunchable<BombAttributes> {
         Set<Healable> healableRegions = RegionUtil.getHealableRegions(
                 BlockUtil.getBlocksInRadius(this.display.getLocation(), attributes.radius())
         );
-
-        for (int i = 0; i < attributes.explosions(); i++) {
-            Bukkit.getScheduler().runTaskLater(Sentinels.getInstance(), () -> {
-                spawnParticle(this.display, Particle.EXPLOSION, 3);
-                spawnParticle(this.display, Particle.FIREWORK, 5);
+        new BukkitRunnable() {
+            int i = attributes.explosions();
+            @Override
+            public void run() {
+                i--;
+                if(i <= 0) cancel();
+                spawnParticle(display, Particle.EXPLOSION, 3);
+                spawnParticle(display, Particle.FIREWORK, 5);
                 for (Healable healable : healableRegions) {
                     healable.damage(attributes.damage());
                 }
-            }, i);
-
-        }
+            }
+        }.runTaskTimer(Sentinels.getInstance(), 0, TIME_BETWEEN_EXPLOSIONS);
     }
 
     private static void spawnParticle(Entity entity, Particle particle, int count) {
         entity.getWorld().spawnParticle(particle, entity.getLocation(), count, 0.1, 0.1, 0.1);
     }
-
 
     @Override
     protected Consumer<? super BlockDisplay> displaySettings(Location location) {

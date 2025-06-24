@@ -3,7 +3,7 @@ package dev.tom.sentinels.launchable.impl.flares;
 import dev.tom.sentinels.launchable.attributes.Gravity;
 import dev.tom.sentinels.launchable.ItemSupplier;
 import dev.tom.sentinels.launchable.attributes.Velocity;
-import dev.tom.sentinels.launchable.items.FieldInfo;
+import dev.tom.sentinels.items.FieldInfo;
 import dev.tom.sentinels.utils.TextUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;

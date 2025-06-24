@@ -1,4 +1,4 @@
-package dev.tom.sentinels.launchable.items;
+package dev.tom.sentinels.items;
 
 import dev.tom.sentinels.data.SentinelDataWrapper;
 import dev.tom.sentinels.launchable.ItemSupplier;
@@ -83,7 +83,7 @@ public class ItemCreator<T extends Serializable & ItemSupplier> {
                 .content(fieldName).color(color(0x3768db))
                 .append(text(": ").color(NamedTextColor.GRAY));
         if (value instanceof Boolean boolValue) {
-            builder.append(text(boolValue ? "Yes" : "No"));
+            builder.append(text(boolValue ? "Yes" : "No").color(NamedTextColor.WHITE));
         } else if (value == null) {
             builder.append(text("N/A").color(NamedTextColor.DARK_GRAY));
         } else {

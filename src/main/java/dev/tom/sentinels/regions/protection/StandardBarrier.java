@@ -6,6 +6,8 @@ import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -20,6 +22,7 @@ public class StandardBarrier implements Barrier {
     private final UUID id;
     private final Region region;
     private final Location location;
+    private final World world;
     private final Block block; // todo
     private double health = MAX_HEALTH;
 
@@ -28,6 +31,7 @@ public class StandardBarrier implements Barrier {
         this.region = region;
         this.location = location;
         this.block = location.getBlock();
+        this.world = location.getWorld();
 
         this.getBlock().setType(FULL_HEALTH_MATERIAL);
         BarrierManager.getInstance().add(this);
@@ -67,7 +71,14 @@ public class StandardBarrier implements Barrier {
     public double damage(double amount) {
         double newHealth = health - amount;
         setHealth(newHealth);
+        doDamageEffect();
         return health;
+    }
+
+    private void doDamageEffect() {
+        if(!this.isDead()){
+            this.world.spawnParticle(Particle.EXPLOSION, this.location, 1, 0.1,0.1,0.1);
+        }
     }
 
     @Override

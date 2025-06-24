@@ -5,8 +5,7 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="C:\Gradle\gradle-8.10" />
-        <option name="gradleJvm" value="corretto-21 (WSL)" />
+        <option name="gradleJvm" value="corretto-22 (WSL)" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />

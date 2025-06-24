@@ -4,7 +4,7 @@ import dev.tom.sentinels.launchable.attributes.Gravity;
 import dev.tom.sentinels.launchable.ItemSupplier;
 import dev.tom.sentinels.launchable.attributes.Knockback;
 import dev.tom.sentinels.launchable.attributes.Velocity;
-import dev.tom.sentinels.launchable.items.FieldInfo;
+import dev.tom.sentinels.items.FieldInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;

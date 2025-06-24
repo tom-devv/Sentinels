@@ -1,4 +1,4 @@
-package dev.tom.sentinels.launchable.items;
+package dev.tom.sentinels.items;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
