@@ -45,7 +45,8 @@ public class Bomb extends Launchable<BombAttributes> {
             public void run() {
                 i--;
                 if(i <= 0) cancel();
-                spawnParticle(display, Particle.EXPLOSION, 3);
+                int count = 3;
+                spawnParticle(display, Particle.EXPLOSION, count);
                 spawnParticle(display, Particle.FIREWORK, 5);
                 for (Healable healable : healableRegions) {
                     healable.damage(attributes.damage());
